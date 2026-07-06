@@ -1,3173 +1,1911 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script async src="https://www.googletagmanager.com/gtag/js?id=G-5YW0T2C109"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-5YW0T2C109');
-</script>
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5YW0T2C109"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-5YW0T2C109');
+  </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>이모지 소트 배틀킹</title>
-  <!-- [다국어] 동적으로 교체되는 SEO 메타 태그 -->
-  <meta name="description" content="이모지를 정렬해 비커를 완성하는 2인 대전 퍼즐! 블루팀 vs 레드팀 실시간 배틀.">
-  <meta name="keywords" content="이모지 소트, 물 정렬 퍼즐, 배틀킹, 킹수학, 정렬 게임">
-  <!-- Google Fonts 구글 폰트 적용 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Color+Emoji&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
-  <!-- [다국어 모달 전용] Font Awesome 아이콘 (모달/버튼 아이콘 전용, 게임과 무관) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>끝말잇킹</title>
   <style>
-    /* ----------------------------------
-       [STYLE.CSS 통합 내장]
-       ---------------------------------- */
     :root {
-      --bg-color: #0c0e17;
-      --panel-bg: rgba(22, 28, 45, 0.95);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      
-      --primary-color: #6366f1;
-      --primary-hover: #4f46e5;
-      --accent-color: #06b6d4;
-      --success-color: #10b981;
-      --danger-color: #ef4444;
-      
-      --blue-team: #3b82f6;
-      --blue-glow: rgba(59, 130, 246, 0.3);
-      --red-team: #ef4444;
-      --red-glow: rgba(239, 68, 68, 0.3);
-      
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      
-      --beaker-width: 48px;
-      --beaker-height: 180px;
-      --beaker-capacity: 4;
-      --emoji-size: 30px;
+      --bg1: #2b1055;
+      --bg2: #3f1f6e;
+      --panel: #ffffff;
+      --ink: #1e1440;
+      --gold: #ffcf3f;
+      --gold-d: #e9a904;
+      --line: #e7e0f5;
+      --p1: #ff5d73;
+      --p2: #4d8bff;
+      --p3: #37c26b;
+      --p4: #ff9f2e;
+      --p5: #a361ff;
+      --p6: #18c5c9;
+      --shadow: 0 18px 40px rgba(20, 6, 55, .35);
+      --shadow-sm: 0 8px 18px rgba(20, 6, 55, .18);
+      --gap: 12px;
     }
 
-    /* [전자칠판 최적화]: 드래그, 선택, 줌, 제스처, 터치 하이라이트 전면 비활성화 */
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      touch-action: none;
       -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-      -webkit-user-drag: none;
     }
 
-    html, body {
-      width: 100vw;
-      height: 100dvh; /* 모던 동적 뷰포트 높이 */
-      height: calc(var(--vh, 1vh) * 100); /* 구형 브라우저 주소창 차감 높이 대응 */
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      overflow: hidden;
-      overscroll-behavior: none; /* 당겨서 새로고침 및 모서리 바운스 차단 */
-      position: relative;
-    }
-
-    /* Background glows */
-    .bg-glow {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(140px);
-      z-index: -1;
-      opacity: 0.12;
-      will-change: transform;
-    }
-    .bg-glow-1 {
-      width: 600px;
-      height: 600px;
-      background: var(--blue-team);
-      top: -100px;
-      left: -100px;
-    }
-    .bg-glow-2 {
-      width: 500px;
-      height: 500px;
-      background: var(--red-team);
-      bottom: -100px;
-      right: -100px;
-    }
-
-    /* Screen state management */
-    .screen {
-      display: none;
-      width: 100%;
+    html,
+    body {
       height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: var(--bg-color);
-      z-index: 10;
+      margin: 0;
     }
-    .screen.active {
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', 'Nanum Gothic', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, #5a2ea0 0%, transparent 55%),
+        radial-gradient(1000px 600px at 100% 0%, #7a2f8f 0%, transparent 50%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    /* .app 높이를 100%로 설정하여 가용 뷰포트에 완전히 맞추고 스크롤 차단 */
+    .app {
+      height: 100%;
       display: flex;
       flex-direction: column;
-      z-index: 50;
+      overflow: hidden;
     }
 
-    /* 1. Setup Screen Styling */
-    #setup-screen {
-      justify-content: center;
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ---------- Brand ---------- */
+    .brand {
+      display: flex;
       align-items: center;
-      overflow-y: auto;
-      padding: 10px;
-      background-color: var(--bg-color);
-      z-index: 100;
+      gap: .4rem;
+      font-weight: 900;
     }
 
-    .setup-container {
-      width: 100%;
-      max-width: 720px;
-      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    .brand .crown {
+      font-size: 1.05em;
+      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .15));
     }
 
-    .setup-header {
+    .logo-title {
+      font-size: clamp(38px, 7vw, 84px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 4px 0 #7a35c9, 0 10px 26px rgba(0, 0, 0, .35);
+    }
+
+    .logo-title .k {
+      color: var(--gold);
+      text-shadow: 0 4px 0 var(--gold-d), 0 10px 26px rgba(0, 0, 0, .35);
+    }
+
+    /* ---------- SETUP ---------- */
+    #setup {
+      height: 100%;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      gap: 18px;
+    }
+
+    .setup-head {
       text-align: center;
-      margin-bottom: 8px;
-    }
-    .logo-emoji {
-      font-size: 2.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
       margin-bottom: 4px;
-      filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4));
-      animation: float 3s ease-in-out infinite;
-    }
-    .setup-header h1 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -0.05em;
-      background: linear-gradient(135deg, #fff 40%, var(--accent-color));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 2px;
-    }
-    .setup-header p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
     }
 
-    .setup-card {
-      background: var(--panel-bg);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    }
-
-    .setting-section {
-      margin-bottom: 14px;
-    }
-    .setting-section h3 {
-      font-size: 0.92rem;
+    .setup-head .sub {
+      color: #e6d8ff;
       font-weight: 700;
-      color: #e5e7eb;
-      flex-shrink: 0;
-      width: 130px; /* 라벨 폭 고정으로 통일감 부여 */
+      font-size: clamp(13px, 2.2vw, 17px);
     }
 
-    /* 가로 한줄 배치 헬퍼 (라벨-컨트롤 대칭 배열) */
-    .flex-row-align {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      padding-bottom: 10px;
-    }
-    .flex-row-align:last-of-type {
-      border-bottom: none;
+    .card {
+      background: var(--panel);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      width: min(920px, 96vw);
+      padding: clamp(16px, 2.4vw, 30px);
     }
 
-    /* Option Grid / Compact Preset */
-    .option-grid {
+    .row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-      flex: 1;
-    }
-    .option-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 6px 10px;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.8rem;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .option-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.25);
-      color: var(--text-main);
-    }
-    .option-btn.active {
-      background: rgba(99, 102, 241, 0.25);
-      border-color: #818cf8;
-      color: #fff;
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3), inset 0 0 5px rgba(99, 102, 241, 0.2);
+      gap: 14px 22px;
     }
 
-    /* 상세 조절기 3열 가로 그리드 (2줄 구조) */
-    .compact-controls-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 10px;
+    .field {
+      flex: 1 1 260px;
+      min-width: 220px;
     }
-    .control-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-    .control-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #d1d5db;
-    }
-    .number-control-btn {
+
+    .field>.lab {
+      font-weight: 900;
+      font-size: 15px;
+      color: #5b4b86;
+      margin: 0 0 9px 2px;
       display: flex;
       align-items: center;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--glass-border);
-      height: 34px;
+      gap: 7px;
     }
-    .ctrl-btn {
-      width: 38px;
-      height: 100%;
-      border: none;
-      background: rgba(255, 255, 255, 0.03);
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
+
+    .chips {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.15s;
+      flex-wrap: wrap;
+      gap: 9px;
     }
-    .ctrl-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .ctrl-btn:active {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    .ctrl-val {
-      width: 46px;
+
+    .chip {
+      border: 2.5px solid var(--line);
+      background: #faf8ff;
+      color: #4b3d76;
+      font-weight: 800;
+      padding: 11px 16px;
+      border-radius: 14px;
+      font-size: 16px;
+      transition: .12s;
+      min-width: 56px;
       text-align: center;
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--accent-color);
-      font-family: monospace;
     }
 
-    /* Theme Selector */
-    .theme-options {
+    .chip:hover {
+      border-color: #c9b8f0;
+    }
+
+    .chip.on {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chip.g.on {
+      background: var(--gold);
+      color: #3a2a00;
+      border-color: var(--gold-d);
+    }
+
+    .hearts-inline {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-      flex: 1;
-    }
-    .theme-btn {
-      padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .theme-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-    }
-    .theme-btn.active {
-      background: rgba(6, 182, 212, 0.25);
-      border-color: var(--accent-color);
-      color: #fff;
-      box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
     }
 
-    .primary-btn {
-      width: 100%;
-      height: 46px;
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.2);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .primary-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 22px rgba(99, 102, 241, 0.3);
+    .hearts-inline .lab2 {
+      font-weight: 800;
+      color: #8a79b6;
+      font-size: 14px;
     }
 
-    /* 다른 게임 고르기 미니 버튼 디자인 */
-    .other-game-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      font-weight: 700;
-      padding: 8px 18px;
-      cursor: pointer;
-      transition: all 0.2s;
+    .start-btn {
+      margin-top: 6px;
+      width: min(920px, 96vw);
+      border-radius: 22px;
+      padding: 20px;
+      font-size: clamp(22px, 3.5vw, 30px);
+      font-weight: 900;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 2.5px solid rgba(255, 255, 255, 0.20);
+      box-shadow: 0 10px 0 rgba(255, 255, 255, 0.15), 0 20px 30px rgba(0, 0, 0, .25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform .06s, box-shadow .06s, background-color .15s, border-color .15s;
+      text-align: center;
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
     }
-    .other-game-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+
+    .start-btn:hover {
+      background: rgba(255, 255, 255, 0.20);
+      border-color: rgba(255, 255, 255, 0.30);
+    }
+
+    .start-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 4px 0 rgba(255, 255, 255, 0.15), 0 12px 20px rgba(0, 0, 0, .25);
+    }
+
+    /* 다른 게임 고르기 링크 버튼 스타일 */
+    .sub-link-btn {
+      margin-top: 8px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #c4b6f0;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.12s, color 0.12s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .sub-link-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
       border-color: rgba(255, 255, 255, 0.25);
-      color: var(--text-main);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
-    /* 2. Game Screen Layout */
-    #game-screen {
-      padding: 4px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .game-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--panel-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 8px 16px;
-      margin-bottom: 6px;
-      height: 52px;
-      flex-shrink: 0;
-    }
-
-    .game-info {
-      display: flex;
-      gap: 10px;
-    }
-    .icon-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--glass-border);
-      color: var(--text-main);
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
+    .hint {
+      color: #9a8bc4;
+      font-size: 13px;
+      margin-top: 8px;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-    }
-    .icon-btn:hover {
-      background: rgba(255,255,255,0.08);
     }
 
-    .timer-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .timer-label {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-    #timer {
-      font-size: 1.5rem;
-      font-weight: 800;
-      font-family: monospace;
-      color: var(--accent-color);
-      text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
-    }
-
-    .score-container {
-      display: flex;
-      align-items: center;
-    }
-
-    /* 3. Battle Arena Split Layout */
-    .battle-arena {
-      flex: 1;
-      display: flex;
-      gap: 8px;
-      height: calc(100vh - 72px);
-      overflow: hidden;
-    }
-
-    .team-side {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-radius: 12px;
-      background: rgba(12, 14, 25, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.02);
-      padding: 8px;
-      overflow: hidden;
+    /* ---------- GAME ---------- */
+    #game {
+      height: 100%;
       position: relative;
-      transition: box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 12px;
+      gap: 6px;
+      overflow: hidden;
     }
 
-    /* 완료 시 팀 보드에 화려한 대기 네온 효과 부여 */
-    .team-side.finished-wait {
-      border-color: var(--success-color);
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      flex: 0 0 auto;
     }
 
-    .left-side {
-      box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.04);
-      border-bottom: 2px solid rgba(59, 130, 246, 0.15);
-    }
-    .right-side {
-      box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.04);
-      border-bottom: 2px solid rgba(239, 68, 68, 0.15);
+    .alt {
+      font-size: 12px;
+      color: #a06;
+      font-weight: 800;
     }
 
-    .arena-divider {
-      width: 2px;
-      background: linear-gradient(to bottom, rgba(59, 130, 246, 0.3), rgba(239, 68, 68, 0.3));
-      align-self: stretch;
-      opacity: 0.5;
+    /* 체인바의 세로 크기를 처음부터 3배(height: 220px)로 고정하여 단어 누적 및 스크롤 연동 */
+    .chainbar {
+      height: 220px;
+      flex: 1;
+      min-width: 0;
+      background: rgba(255, 255, 255, .10);
+      border: 2px solid rgba(255, 255, 255, .14);
+      border-radius: 18px;
+      padding: 10px 14px;
+      overflow-y: auto;
     }
 
-    .team-header {
+    .chainbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .chainbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 3px;
+    }
+
+    .chain {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+    }
+
+    .wtile {
+      background: #fff;
+      border-radius: 12px;
+      padding: 5px 12px;
+      font-size: clamp(16px, 2.2vw, 24px);
+      font-weight: 900;
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+      position: relative;
+      border-bottom: 3px solid #e7e0f5;
+      flex: none;
+    }
+
+    .wtile.seed {
+      border-bottom-color: var(--gold-d);
+      background: #fff7dd;
+    }
+
+    .wtile .who {
+      position: absolute;
+      top: -8px;
+      left: 6px;
+      font-size: 9px;
+      font-weight: 900;
+      color: #fff;
+      padding: 1px 5px;
+      border-radius: 6px;
+    }
+
+    .wtile.pop {
+      animation: pop .3s cubic-bezier(.2, 1.3, .4, 1);
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(.6);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .arrow {
+      color: #d8c8ff;
+      font-size: 16px;
+      font-weight: 900;
+      flex: none;
+    }
+
+    /* 우상단 이모지 버튼 수직 정렬 컨테이너 */
+    .topbar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
+    .top-action-btn {
+      width: 38px;
+      height: 38px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.05s;
+      color: #fff;
+      user-select: none;
+    }
+
+    .top-action-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .top-action-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* ---------- CENTER SCREEN (중앙 상시 전광판) ---------- */
+    #centerScreen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 8px 12px;
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.25);
+      min-height: 50px;
+    }
+
+    .screen-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #c4b6f0;
+      letter-spacing: 1.5px;
+      margin-bottom: 2px;
+    }
+
+    .screen-word {
+      font-size: clamp(78px, 15vw, 162px);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 40px var(--pcol, var(--gold)), 0 4px 12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    /* 스크린 단어 팝업 애니메이션 */
+    .screen-word.pop {
+      animation: screenPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes screenPop {
+      0% {
+        transform: scale(0.75);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* 신규 타이머 바 (전광판 아래 배치, 오른쪽에서 왼쪽으로 잠식하며 소멸) */
+    #timerBarWrap {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 4px 0 6px 0;
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      flex: 0 0 auto;
+    }
+
+    #timerBarFill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #37c26b, #7ee0a0);
+      transition: width 0.1s linear;
+      border-radius: 6px;
+    }
+
+    #timerBarWrap.warn #timerBarFill {
+      background: linear-gradient(90deg, #e23b5a, #ff8aa0);
+    }
+
+    /* player grid: Flexbox 분산 정렬 및 하단 이동 */
+    .pgrid {
       display: flex;
       justify-content: space-between;
+      height: 80px;
+      flex: 0 0 80px;
+      width: 100%;
+    }
+
+    .pcell {
+      background: rgba(255, 255, 255, .10);
+      border: 3px solid rgba(255, 255, 255, .16);
+      border-radius: 18px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      height: 100%;
+      width: calc((100% - 5 * var(--gap)) / 6);
+      flex: none;
+      min-width: 0;
+      transition: transform .15s, box-shadow .15s, background .15s;
+    }
+
+    .pcell.empty {
+      background: rgba(255, 255, 255, .045);
+      border-style: dashed;
+    }
+
+    .pcell.empty .emptyTag {
+      margin: auto;
+      color: rgba(255, 255, 255, .4);
+      font-weight: 900;
+      font-size: 16px;
+    }
+
+    .pcell.out {
+      opacity: .5;
+      filter: grayscale(.5);
+    }
+
+    .pcell.active {
+      background: #fff;
+      border-color: var(--pcol);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .pcell-head {
+      display: flex;
       align-items: center;
-      margin-bottom: 8px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      flex-shrink: 0;
+      gap: 6px;
     }
-    .team-name {
-      font-size: 1.05rem;
-      font-weight: 800;
+
+    .pbadge {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 13px;
+      flex: none;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, .15);
     }
-    .left-side .team-name {
-      color: var(--blue-team);
-      text-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+
+    .pcell-name {
+      font-weight: 900;
+      font-size: clamp(13px, 1.5vw, 18px);
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .right-side .team-name {
-      color: var(--red-team);
-      text-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+
+    .pcell.active .pcell-name {
+      color: var(--ink);
     }
-    .team-progress {
-      font-size: 0.9rem;
+
+    .pcell-status {
+      margin-left: auto;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .outtag {
+      font-size: 11px;
+      font-weight: 900;
+      color: #ff9db0;
+      letter-spacing: 0.5px;
+    }
+
+    .pcell.active .outtag {
+      color: #c33;
+    }
+
+    .pcell-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .cellLast {
+      font-size: clamp(14px, 1.8vw, 18px);
+      font-weight: 900;
+      color: #fff;
+      word-break: break-all;
+    }
+
+    .cellLast.muted {
+      color: rgba(255, 255, 255, .45);
+      font-size: 13px;
       font-weight: 700;
     }
 
-    /* 4. Beaker Board Grid */
-    .beaker-board {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--beaker-width), 1fr));
-      grid-auto-rows: auto;
-      gap: 12px 10px;
-      justify-content: center;
-      align-content: center;
-      padding: 6px;
-      overflow: hidden;
-      perspective: 1000px;
+    .pcell.active .cellLast {
+      color: var(--ink);
+    }
+
+    .cellLast.typing-status {
+      color: var(--pcol);
+      font-size: 13px;
+      font-weight: 900;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        opacity: 0.5;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* 하단 입력 액션 구역: 높이를 280px로 확대하여 키패드가 완전히 담기게 고정 */
+    .game-bottom {
+      height: 280px;
+      flex: 0 0 280px;
+      display: flex;
+      justify-content: space-between;
+      min-height: 0;
       width: 100%;
+    }
+
+    .pcell-bottom-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+      width: calc((100% - 5 * var(--gap)) / 6);
+      flex: none;
+      min-width: 0;
       height: 100%;
     }
 
-    /* Beaker styling */
-    .beaker {
-      width: var(--beaker-width);
-      height: var(--beaker-height);
-      background: rgba(255, 255, 255, 0.02);
-      border: 1.5px dashed rgba(255, 255, 255, 0.12);
-      border-top: none;
-      border-bottom-left-radius: 24px;
-      border-bottom-right-radius: 24px;
-      position: relative;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-      padding-bottom: 12px;
-      padding-top: 10px;
-      cursor: grab;
-      transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
+    .pcell-bottom-action.active {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .beaker.filled {
-      border-style: solid;
-      border-color: var(--glass-border);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .beaker.hovered {
-      border-color: var(--accent-color);
-      background: rgba(6, 182, 212, 0.06);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
-    }
-
-    .left-side .beaker.completed {
-      border-style: solid;
-      border-color: var(--blue-team);
-      background: rgba(59, 130, 246, 0.06);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
-      animation: completedPulseBlue 1.5s infinite;
-    }
-    .right-side .beaker.completed {
-      border-style: solid;
-      border-color: var(--red-team);
-      background: rgba(239, 68, 68, 0.06);
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
-      animation: completedPulseRed 1.5s infinite;
-    }
-    .beaker.completed::after {
-      content: '✨';
-      position: absolute;
-      top: -18px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.95rem;
-    }
-
-    /* Emoji Slot */
-    .emoji-slot {
-      width: 90%;
-      height: calc((var(--beaker-height) - 22px) / var(--beaker-capacity));
-      min-height: calc(var(--emoji-size) - 4px);
-      max-height: 44px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.8rem;
-      transition: transform 0.12s, opacity 0.12s;
-      pointer-events: none;
-      position: relative;
-      z-index: 2;
-      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
-    }
-    .emoji-slot.dragging-out {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-
-    /* 5. 팀별 하단 다시 시작 버튼 */
-    .side-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      flex-shrink: 0;
-      margin-top: 4px;
-    }
-    .reset-side-btn {
-      width: 100%;
-      height: 38px;
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      color: var(--text-main);
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.03);
-    }
-    .left-side .reset-side-btn {
-      border-color: rgba(59, 130, 246, 0.2);
-    }
-    .left-side .reset-side-btn:hover {
-      background: rgba(59, 130, 246, 0.12);
-      border-color: var(--blue-team);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
-    }
-    .right-side .reset-side-btn {
-      border-color: rgba(239, 68, 68, 0.2);
-    }
-    .right-side .reset-side-btn:hover {
-      background: rgba(239, 68, 68, 0.12);
-      border-color: var(--red-team);
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
-    }
-
-    /* 6. Drag Overlay Layer */
-    .drag-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
-    }
-    .drag-emoji {
-      position: absolute;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-      gap: 3px;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(1.1);
-      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
-      z-index: 10000;
-      will-change: transform;
-    }
-    .drag-emoji-node {
-      font-size: 2.2rem;
-      width: var(--emoji-size);
-      height: var(--emoji-size);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-    }
-
-    /* 7. Modal Styling */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(8, 9, 15, 0.95);
-      z-index: 20000;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal.active {
-      display: flex;
-    }
-    .modal-content {
-      background: var(--panel-bg);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 24px;
-      padding: 30px;
-      text-align: center;
-      width: 90%;
-      max-width: 520px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-      animation: scaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .win-trophy {
-      font-size: 4.6rem;
-      margin-bottom: 12px;
-      animation: bounce 2s infinite;
-    }
-    .modal-content h2 {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-    }
-    .win-time-desc {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 15px;
-      line-height: 1.5;
-    }
-    .final-time {
-      font-size: 2.8rem;
+    .turnTag {
       font-weight: 900;
-      color: var(--accent-color);
-      font-family: monospace;
-      margin-bottom: 25px;
-      text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+      color: var(--pcol);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
     }
-    .modal-buttons {
+
+    /* 제시 글자 박스 */
+    .req-char-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      margin-bottom: 2px;
+    }
+
+    .req-syl-inline {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .req-alt-inline {
+      font-size: 11px;
+      color: #e6d8ff;
+      font-weight: 800;
+    }
+
+    /* 입력 프리뷰 */
+    .cellPreview {
+      font-size: clamp(16px, 2vw, 24px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.4em;
+      line-height: 1;
+      width: 100%;
+      word-break: break-all;
+    }
+
+    .cellPreview .ph {
+      color: #c3b4e8;
+      font-size: .56em;
+      letter-spacing: 0;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    /* 문자 높이 매칭으로 흔들림 없는 완벽한 직선(수평선) 정렬 적용 */
+    .completed-text {
+      display: inline-block;
+      padding-bottom: 2px;
+      border-bottom: 3.5px solid transparent;
+      /* 투명 테두리로 높이 스펙 1:1 동기화 */
+      vertical-align: bottom;
+    }
+
+    .active-char {
+      display: inline-block;
+      padding-bottom: 2px;
+      border-bottom: 3.5px solid var(--pcol);
+      /* 플레이어 색상의 굵은 밑줄 */
+      vertical-align: bottom;
+      animation: borderBlink 1.1s step-end infinite;
+      min-width: 1ch;
+      text-align: center;
+    }
+
+    @keyframes borderBlink {
+      50% {
+        border-bottom-color: transparent;
+      }
+    }
+
+    .cellFeedback {
+      min-height: 16px;
+      font-weight: 900;
+      font-size: 11px;
+    }
+
+    .cellFeedback.err {
+      color: #ff6b8b;
+    }
+
+    .cellFeedback.ok {
+      color: #5eff9f;
+    }
+
+    .cellFeedback.checking {
+      color: #d8c3ff;
+    }
+
+    /* keypad inline */
+    .keypad-inline {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 3px;
+      margin-top: auto;
     }
-    .secondary-btn {
+
+    .keypad-inline .krow {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
       width: 100%;
-      height: 52px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      color: var(--text-main);
-      font-size: 1.05rem;
-      font-weight: 600;
+    }
+
+    .keypad-inline .key {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 28px;
+      border-radius: 6px;
+      background: #f4f0fc;
+      border: 1.5px solid #e5ddf7;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--ink);
+      box-shadow: 0 2px 0 #ddd2f2;
+      transition: transform .05s, box-shadow .05s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .keypad-inline .key:active {
+      transform: translateY(2px);
+      box-shadow: 0 0 0 #ddd2f2;
+    }
+
+    .keypad-inline .key.util {
+      background: #efe9fb;
+      color: #6a58a0;
+      font-size: 10px;
+      flex: 1.2 1 0;
+    }
+
+    .keypad-inline .key.shift.on {
+      background: var(--pcol);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .keypad-inline .key.del {
+      background: #ffeef0;
+      color: #d43b57;
+      font-size: 10px;
+      flex: 1.2 1 0;
+    }
+
+    .keypad-inline .key.enter {
+      background: linear-gradient(180deg, #ffe071, var(--gold));
+      color: #3a2a00;
+      box-shadow: 0 2px 0 var(--gold-d);
+      flex: 2 1 0;
+      font-size: 11px;
+      height: 30px;
+      margin-top: 2px;
+    }
+
+    .btn-pass-inline {
+      background: rgba(255, 255, 255, 0.12);
+      color: #e6d8ff;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 800;
+      font-size: 11px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: background .12s, color .12s;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-    .secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
     }
 
-    /* Animations & Pulse */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+    .btn-pass-inline:hover {
+      background: #ffeef0;
+      color: #e23b5a;
+      border-color: #ffdce2;
     }
-    @keyframes scaleUp {
-      from { opacity: 0; transform: scale(0.85); }
-      to { opacity: 1; transform: scale(1); }
+
+    /* toast */
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 92px;
+      transform: translateX(-50%);
+      background: rgba(30, 16, 64, .92);
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      padding: 12px 22px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      z-index: 40;
+      animation: toastIn .2s ease;
     }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-      100% { transform: translateY(0px); }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
     }
+
+    /* result */
+    #result {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .trophy {
+      font-size: clamp(80px, 18vw, 150px);
+      animation: bounce 1.1s ease-in-out infinite;
+    }
+
     @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.85; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.03); }
-    }
-    @keyframes completedPulseBlue {
-      0% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.25); }
-      50% { box-shadow: 0 0 24px rgba(59, 130, 246, 0.5); }
-      100% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.25); }
-    }
-    @keyframes completedPulseRed {
-      0% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.25); }
-      50% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.5); }
-      100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.25); }
-    }
-  </style>
 
-  <!-- =========================================================
-       [다국어 언어 선택기 전용 스타일 - 게임 CSS와 100% 분리]
-       · 모든 규칙을 #kmLangTrigger / #langModal / #kmToast 로 스코프
-       · 게임의 클래스(.modal, .modal-content 등)와 절대 겹치지 않게 km- 접두어 사용
-       · 폰트/사이즈 규칙이 게임으로 새어나가지 않도록 컨테이너 단위로만 지정
-       ========================================================= -->
-  <style id="km-lang-style">
-    /* [요구10] 모달 내부 박스 사이징 강제 보정 */
-    #langModal, #langModal * { box-sizing: border-box !important; }
+      0%,
+      100% {
+        transform: translateY(0) rotate(-4deg);
+      }
 
-    /* [요구14] Font Awesome 아이콘은 고유 폰트를 유지 → 네모(□) 깨짐 방지.
-       모달 안의 * 에 sans-serif 를 강제하지 않고, 아이콘 폰트만 명시적으로 보호 */
-    #langModal i[class*="fa-"],
-    #kmLangTrigger i[class*="fa-"],
-    #kmToast i[class*="fa-"] {
-      font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      50% {
+        transform: translateY(-16px) rotate(4deg);
+      }
     }
 
-    /* [요구7] 한글은 기존 Noto Sans KR, 그 외 무난한 시스템 sans-serif */
-    #kmLangTrigger, #langModal, #kmToast {
-      font-family: 'Noto Sans KR', 'Segoe UI', system-ui, -apple-system, 'Malgun Gothic', Arial, sans-serif;
-      line-height: 1.3;
+    .win-name {
+      font-size: clamp(34px, 7vw, 72px);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, .25);
     }
 
-    /* ---- 우측 상단 트리거 버튼 [요구: z-index 최상단] ---- */
-    #kmLangTrigger { position: fixed; top: 14px; right: 14px; z-index: 99999; }
-    #kmLangBtn {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(31, 41, 55, 0.78);
-      border: 1px solid #4b5563; border-radius: 999px;
-      padding: 8px 14px; color: #f3f4f6;
-      font-size: 14px; font-weight: 500; cursor: pointer;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-    }
-    #kmLangBtn:hover { background: rgba(55, 65, 81, 0.95); }
-    #kmLangBtn .km-ic { color: #9ca3af; }
-    #kmLangBtn .km-flag { width: 22px; height: auto; border-radius: 2px; display: block; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
-    #kmLangBtn .km-cur-name { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #kmLangBtn .km-chev { font-size: 11px; }
-    @media (max-width: 640px) { #kmLangBtn .km-cur-name { display: none; } }
-
-    /* ---- 모달 오버레이 [요구: z-index 최상단] ---- */
-    #langModal {
-      position: fixed; inset: 0; z-index: 100000;
-      display: flex; align-items: flex-start; justify-content: center;
-      padding: 64px 16px 16px;
-      background: rgba(0, 0, 0, 0.6);
-      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
-    }
-    @media (min-width: 640px) { #langModal { align-items: center; padding: 16px; } }
-    #langModal.km-active { opacity: 1; visibility: visible; }
-
-    /* 게임 전역 * { user-select:none; touch-action:none } 를 모달 안에서만 되돌림 */
-    #langModal input { user-select: text; -webkit-user-select: text; touch-action: auto; }
-    #langModal .km-modal-body { touch-action: pan-y; }
-
-    .km-modal-box {
-      background: #111827; border: 1px solid #374151;
-      border-radius: 18px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
-      width: 100%; max-width: 860px; max-height: 85vh;
-      display: flex; flex-direction: column; overflow: hidden;
-      transform: scale(0.96) translateY(-8px); transition: transform 0.25s ease;
-    }
-    #langModal.km-active .km-modal-box { transform: scale(1) translateY(0); }
-
-    .km-modal-head {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 20px; border-bottom: 1px solid #1f2937;
-    }
-    .km-modal-title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #fff; }
-    .km-modal-title .km-ic-y { color: #f59e0b; }
-    .km-close {
-      width: 38px; height: 38px; border: none; border-radius: 999px;
-      background: #1f2937; color: #9ca3af; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; font-size: 16px;
-    }
-    .km-close:hover { background: #374151; color: #fff; }
-
-    .km-modal-search { padding: 16px 20px 6px; position: relative; }
-    .km-search-ic { position: absolute; left: 34px; top: 50%; transform: translateY(-30%); color: #9ca3af; pointer-events: none; }
-    #kmSearchInput {
-      width: 100%; background: #1f2937; border: 1px solid #374151; color: #fff;
-      font-size: 14px; border-radius: 12px; padding: 13px 14px 13px 42px; outline: none;
-    }
-    #kmSearchInput::placeholder { color: #6b7280; }
-    #kmSearchInput:focus { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35); }
-
-    .km-modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
-    .km-modal-body::-webkit-scrollbar { width: 8px; }
-    .km-modal-body::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-    .km-modal-body::-webkit-scrollbar-track { background: rgba(31, 41, 55, 0.5); border-radius: 4px; }
-
-    .km-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 10px; }
-    @media (min-width: 640px)  { .km-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .km-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1280px) { .km-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    .km-lang-item {
-      display: flex; align-items: center; gap: 12px; padding: 12px;
-      border-radius: 12px; border: 1px solid #374151; background: rgba(31, 41, 55, 0.4);
-      cursor: pointer; transition: background 0.15s, border-color 0.15s; overflow: hidden;
-    }
-    .km-lang-item:hover { background: #374151; border-color: #6b7280; }
-    .km-lang-item.km-selected { background: #1f2937; border-color: #f59e0b; box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.5); }
-    .km-item-flag { flex-shrink: 0; width: 34px; height: 24px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(107, 114, 128, 0.5); }
-    .km-item-flag img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .km-item-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-    .km-item-name { font-size: 14px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .km-lang-item.km-selected .km-item-name { color: #fbbf24; }
-    .km-item-sub { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .km-check { color: #f59e0b; font-size: 16px; margin-left: 6px; }
-
-    .km-noresult { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: #6b7280; gap: 10px; }
-    .km-noresult.km-show { display: flex; }
-    .km-noresult i { font-size: 34px; }
-
-    /* ---- 토스트 알림 ---- */
-    #kmToast {
-      position: fixed; bottom: 22px; right: 22px; z-index: 100001;
-      background: #1f2937; border: 1px solid #374151;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); border-radius: 12px;
-      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
-      transform: translateY(160%); opacity: 0;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-    #kmToast.km-show { transform: translateY(0); opacity: 1; }
-    .km-toast-ic { width: 32px; height: 32px; border-radius: 999px; background: rgba(16, 185, 129, 0.2); color: #34d399; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .km-toast-msg { font-size: 14px; font-weight: 500; color: #fff; }
-    .km-toast-sub { font-size: 12px; color: #9ca3af; }
-  </style>
-
-  <!-- =========================================================
-       [해상도 최적화] 1920x1080 / 1536x864 / 1366x768 / 1334x800 /
-       1280x800 / 1205x753 등에서 상단 헤더로 하단이 잘리지 않고
-       화면을 정확히 꽉 채우도록 보정. (기존 게임 규칙은 유지하고 오버라이드만)
-       ========================================================= -->
-  <style id="km-responsive-fix">
-    /* 게임 실행 화면: 남은 공간을 flex로 정확히 채우기 */
-    #game-screen { height: 100%; min-height: 0; overflow: hidden; }
-
-    /*
-      핵심: flex 자식의 기본 min-height:auto 때문에 비커 보드가 콘텐츠 높이만큼
-      버티면서 하단 '다시 시작' 버튼이 밀려 잘리는 문제를 min-height:0 으로 해결.
-      (100vh 고정 대신 실제 뷰포트 높이에 맞춰 채움 → 상단 헤더 잘림 방지)
-    */
-    #game-screen .battle-arena {
-      flex: 1 1 auto;
-      height: auto;
-      min-height: 0;
-    }
-    #game-screen .team-side { min-height: 0; }
-    #game-screen .beaker-board { min-height: 0; min-width: 0; }
-
-    /* 세로가 낮은 해상도(768 / 753 / 800 등)에서 설정 카드가 세로로 잘리지 않도록 콤팩트화 */
-    @media (max-height: 820px) {
-      #setup-screen { padding: 8px; }
-      .setup-header { margin-bottom: 4px; }
-      .logo-emoji { font-size: 2rem; margin-bottom: 2px; }
-      .setup-header h1 { font-size: 1.8rem; }
-      .setup-header p { font-size: 0.82rem; }
-      .setup-card { padding: 14px 16px; }
-      .setting-section { margin-bottom: 10px; }
-      .flex-row-align { padding-bottom: 8px; }
-      .compact-controls-grid { padding: 8px; gap: 8px; }
-      .primary-btn { height: 42px; }
-    }
-    @media (max-height: 700px) {
-      .logo-emoji { font-size: 1.5rem; }
-      .setup-header h1 { font-size: 1.45rem; }
-      .setup-card { padding: 12px 14px; }
-      .setting-section { margin-bottom: 8px; }
-      .number-control-btn { height: 32px; }
-      .primary-btn { height: 40px; }
+    .win-sub {
+      color: #e6d8ff;
+      font-weight: 800;
+      font-size: clamp(15px, 2.6vw, 20px);
     }
 
-    /* 초대형 전자칠판/FHD 이상에서 설정 카드가 너무 작아 보이지 않도록 폭 확장 */
-    @media (min-width: 1600px) {
-      .setup-container { max-width: 72 0px; }
+    .result-stats {
+      background: rgba(255, 255, 255, .12);
+      border-radius: 18px;
+      padding: 14px 22px;
+      color: #fff;
+      font-weight: 800;
+      display: flex;
+      gap: 26px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    /* 언어 트리거가 설정 화면 상단 우측에서 헤더 텍스트와 겹치지 않도록 낮은 높이에서 살짝 축소 */
-    @media (max-height: 700px) {
-      #kmLangBtn { padding: 6px 12px; font-size: 13px; }
+    .result-stats span b {
+      color: var(--gold);
+      font-size: 1.3em;
+    }
+
+    .again {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .again .primary {
+      border-radius: 18px;
+      padding: 16px 30px;
+      font-weight: 900;
+      font-size: 20px;
+      background: linear-gradient(180deg, #ffe071, var(--gold));
+      color: #3a2a00;
+      box-shadow: 0 8px 0 var(--gold-d);
+    }
+
+    .again .ghost {
+      background: rgba(255, 255, 255, .12);
+      color: #e6d8ff;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .emoji-fall {
+      position: fixed;
+      top: -40px;
+      font-size: 30px;
+      z-index: 50;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+      }
+    }
+
+    @media (max-width:760px) {
+      :root {
+        --gap: 6px;
+      }
     }
   </style>
 </head>
+
 <body>
-  <!-- ============================================================
-       [다국어 언어 선택기] 우측 상단 트리거 버튼 (첫 화면에서만 노출)
-       ============================================================ -->
-  <div id="kmLangTrigger">
-    <button id="kmLangBtn" type="button" aria-label="Language">
-      <i class="fa-solid fa-globe km-ic"></i>
-      <img id="kmCurrentFlag" class="km-flag" src="https://flagcdn.com/w40/us.png" alt="flag">
-      <span id="kmCurrentName" class="km-cur-name">English</span>
-      <i class="fa-solid fa-chevron-down km-ic km-chev"></i>
-    </button>
-  </div>
+  <div class="app">
 
-  <!-- [다국어] 검색창 포함 언어 선택 모달 -->
-  <div id="langModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="km-modal-box">
-      <div class="km-modal-head">
-        <h2 class="km-modal-title">
-          <i class="fa-solid fa-language km-ic-y"></i>
-          <span>Language / 언어</span>
-        </h2>
-        <button id="kmCloseBtn" type="button" class="km-close" aria-label="Close">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+    <!-- ===================== SETUP ===================== -->
+    <section id="setup">
+      <div class="setup-head">
+        <div class="logo-title">끝말잇<span class="k">킹</span> 👑</div>
+        <div class="sub">전자칠판 끝말잇기 · 우리말샘 사전 판정 · 명사 · 5글자 이내</div>
       </div>
-      <div class="km-modal-search">
-        <i class="fa-solid fa-magnifying-glass km-search-ic"></i>
-        <input type="text" id="kmSearchInput" placeholder="Search / 검색 ..." autocomplete="off">
-      </div>
-      <div class="km-modal-body">
-        <div id="kmLangGrid" class="km-grid"></div>
-        <div id="kmNoResult" class="km-noresult">
-          <i class="fa-regular fa-face-frown-open"></i>
-          <p>No results</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- [다국어] 변경 완료 토스트 -->
-  <div id="kmToast">
-    <div class="km-toast-ic"><i class="fa-solid fa-check"></i></div>
-    <div>
-      <p id="kmToastMsg" class="km-toast-msg">Language changed.</p>
-      <p id="kmToastLang" class="km-toast-sub">English</p>
-    </div>
-  </div>
-
-  <!-- 배경 장식용 그라데이션 오라 -->
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
-
-  <!-- 1. 설정 화면 -->
-  <main id="setup-screen" class="screen active">
-    <div class="setup-container">
-      <header class="setup-header">
-        <div class="logo-emoji">⚔️🧪🎨</div>
-        <h1>이모지 소트 배틀킹</h1>
-        <p>소트 퍼즐 한계에 도전하라!</p>
-      </header>
-
-      <section class="setup-card">
-        <!-- 1. 난이도 프리셋 -->
-        <div class="setting-section flex-row-align">
-          <h3>난이도 프리셋</h3>
-          <div class="option-grid" id="difficulty-options">
-            <button type="button" class="option-btn active" data-value="easy">🟢 쉬움</button>
-            <button type="button" class="option-btn" data-value="normal">🟡 보통</button>
-            <button type="button" class="option-btn" data-value="hard">🔴 어려움</button>
-            <button type="button" class="option-btn" data-value="veryhard">🔥 완전 어려움</button>
-            <button type="button" class="option-btn" data-value="insane">💀 핵 어려움</button>
-            <button type="button" class="option-btn" data-value="impossible">👾 불가능</button>
+      <div class="card">
+        <div class="row">
+          <div class="field">
+            <div class="lab">👥 인원</div>
+            <div class="chips" id="playerCount"></div>
           </div>
-        </div>
-
-        <!-- 2. 상세 설정 조절 -->
-        <div class="setting-section" style="border-bottom: 1px solid rgba(255, 255, 255, 0.04); padding-bottom: 12px; margin-top: 12px;">
-          <h3 style="margin-bottom: 8px; font-size: 0.95rem; font-weight: 700; width: 100%;">상세 설정 조절</h3>
-          <div class="compact-controls-grid">
-            <!-- 총 비커 수 -->
-            <div class="control-col">
-              <span class="control-label">🧪 총 비커 수</span>
-              <div class="number-control-btn">
-                <button type="button" class="ctrl-btn" id="filled-dec">-</button>
-                <span id="filled-val" class="ctrl-val">10</span>
-                <button type="button" class="ctrl-btn" id="filled-inc">+</button>
-              </div>
-            </div>
-            <!-- 빈 비커 수 -->
-            <div class="control-col">
-              <span class="control-label">🥛 빈 비커 수</span>
-              <div class="number-control-btn">
-                <button type="button" class="ctrl-btn" id="empty-dec">-</button>
-                <span id="empty-val" class="ctrl-val">2</span>
-                <button type="button" class="ctrl-btn" id="empty-inc">+</button>
-              </div>
-            </div>
-            <!-- 이모지 종류 수 -->
-            <div class="control-col">
-              <span class="control-label">🎨 이모지 종류 수</span>
-              <div class="number-control-btn">
-                <button type="button" class="ctrl-btn" id="emoji-dec">-</button>
-                <span id="emoji-val" class="ctrl-val">4</span>
-                <button type="button" class="ctrl-btn" id="emoji-inc">+</button>
-              </div>
+          <div class="field">
+            <div class="lab">⏱ 제한시간</div>
+            <div class="chips" id="timeOpt">
+              <button class="chip" data-t="10">10초</button>
+              <button class="chip on" data-t="20">20초</button>
+              <button class="chip" data-t="30">30초</button>
+              <button class="chip" data-t="0">무제한</button>
             </div>
           </div>
         </div>
 
-        <!-- 3. 시간 설정 -->
-        <div class="setting-section flex-row-align">
-          <h3>시간 제한</h3>
-          <div class="option-grid" id="time-options">
-            <button type="button" class="option-btn" data-value="60">⏱️ 1분</button>
-            <button type="button" class="option-btn" data-value="120">⏱️ 2분</button>
-            <button type="button" class="option-btn" data-value="180">⏱️ 3분</button>
-            <button type="button" class="option-btn" data-value="240">⏱️ 4분</button>
-            <button type="button" class="option-btn" data-value="300">⏱️ 5분</button>
-            <button type="button" class="option-btn active" data-value="infinite">♾️ 무제한</button>
+        <div class="row" style="margin-top:18px;">
+          <div class="field">
+            <div class="lab">💔 탈락 방식</div>
+            <div class="chips" id="elimMode">
+              <button class="chip on" data-e="out">즉시 아웃</button>
+              <button class="chip" data-e="heart">하트 감소</button>
+            </div>
+            <div class="hearts-inline hidden" id="heartRow">
+              <span class="lab2">하트 개수</span>
+              <div class="chips" id="heartCount">
+                <button class="chip g" data-h="2">2</button>
+                <button class="chip g on" data-h="3">3</button>
+                <button class="chip g" data-h="5">5</button>
+              </div>
+            </div>
           </div>
         </div>
-
-        <!-- 4. 이모지 테마 -->
-        <div class="setting-section flex-row-align">
-          <h3>이모지 테마</h3>
-          <div class="theme-options">
-            <button type="button" class="theme-btn active" data-theme="mixed">🎨 혼합</button>
-            <button type="button" class="theme-btn" data-theme="animals">🦁 동물원</button>
-            <button type="button" class="theme-btn" data-theme="fruits">🍎 과일</button>
-            <button type="button" class="theme-btn" data-theme="foods">🍔 음식</button>
-            <button type="button" class="theme-btn" data-theme="activities">⚽ 스포츠</button>
-          </div>
-        </div>
-
-        <button type="button" id="start-btn" class="primary-btn">배틀킹 시작하기 ⚔️</button>
-        
-        <!-- 다른 게임 고르기 버튼화 디자인 적용 -->
-        <div style="text-align: center; margin-top: 14px;">
-          <button type="button" id="other-game-btn" class="other-game-btn">다른 게임 고르기</button>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- 1.5. 신규 카운트다운 로딩 화면 -->
-  <main id="countdown-screen" class="screen">
-    <div style="margin: auto; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
-      <h2 style="font-size: 2.2rem; font-weight: 800; letter-spacing: 0.1em; color: var(--accent-color); animation: pulse 1.5s infinite;">
-        ⚔️ 배틀킹을 준비합니다 ⚔️
-      </h2>
-      <p style="color: var(--text-muted); font-size: 1.05rem;">준비하세요!</p>
-      
-      <!-- 커다란 카운트다운 숫자 오라 연출 -->
-      <div id="countdown-number" style="font-size: 9rem; font-weight: 900; color: #fff; text-shadow: 0 0 35px var(--primary-color); font-family: 'Outfit', sans-serif; min-width: 200px; height: 200px; display: flex; align-items: center; justify-content: center;">
-        5
-      </div>
-      
-      <!-- 프로그레스 라인 바 -->
-      <div style="width: 260px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; position: relative;">
-        <div id="countdown-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--accent-color));"></div>
-      </div>
-    </div>
-  </main>
-
-  <!-- 2. 게임 본 화면 -->
-  <main id="game-screen" class="screen">
-    <!-- 상단 툴바 -->
-    <header class="game-header">
-      <div class="game-info">
-        <button type="button" id="back-btn" class="icon-btn">
-          <span class="icon">🏠</span> 설정 변경
-        </button>
       </div>
 
-      <div class="timer-container">
-        <span class="timer-label" id="timer-label">⏱️ 진행 시간</span>
-        <span id="timer">00:00.00</span>
+      <button class="start-btn" id="startBtn">게임 시작 🎮</button>
+      <a href="http://킹수학.com" class="sub-link-btn" id="otherGameBtn">다른 게임 고르기</a>
+      <div class="hint">랜덤으로 시작 플레이어와 제시어를 뽑아 드려요.</div>
+    </section>
+
+    <!-- ===================== GAME ===================== -->
+    <section id="game" class="hidden">
+      <!-- 상단 툴바 (홈/전체화면 수직 버튼 그룹화) -->
+      <div class="topbar">
+        <div class="chainbar">
+          <div class="chain" id="chain"></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="top-action-btn" id="homeBtn" title="홈으로">🏠</button>
+          <button class="top-action-btn" id="fullscreenBtn" title="전체화면">🖥️</button>
+        </div>
       </div>
 
-      <!-- 우측 전체화면 토글 탑재 -->
-      <div class="score-container">
-        <button type="button" id="fullscreen-btn" class="icon-btn" style="background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.3);">
-          🖥️ 전체화면
-        </button>
+      <!-- 중앙 대형 전광판 스크린 -->
+      <div id="centerScreen">
+        <div class="screen-label" id="screenLabel">제시어</div>
+        <div class="screen-word" id="screenWord">사람</div>
       </div>
-    </header>
 
-    <!-- 좌우 분할 보드 영역 -->
-    <div class="battle-arena">
-      <!-- 왼쪽: 블루 팀 -->
-      <section class="team-side left-side" id="left-team-side">
-        <div class="team-header">
-          <h2 class="team-name" id="left-team-title">🔵 BLUE TEAM</h2>
-          <div class="team-progress">
-            <span class="km-completed-label">완료:</span> <span id="left-completed">0</span> / <span id="left-total">8</span>
-          </div>
-        </div>
-        <div id="left-beaker-board" class="beaker-board" data-side="left"></div>
-        <div class="side-controls">
-          <button type="button" id="reset-left-btn" class="reset-side-btn">🔵 다시 시작</button>
-        </div>
-      </section>
-
-      <!-- 중간 분할 네온선 -->
-      <div class="arena-divider"></div>
-
-      <!-- 오른쪽: RED 팀 -->
-      <section class="team-side right-side" id="right-team-side">
-        <div class="team-header">
-          <h2 class="team-name" id="right-team-title">🔴 RED TEAM</h2>
-          <div class="team-progress">
-            <span class="km-completed-label">완료:</span> <span id="right-completed">0</span> / <span id="right-total">8</span>
-          </div>
-        </div>
-        <div id="right-beaker-board" class="beaker-board" data-side="right"></div>
-        <div class="side-controls">
-          <button type="button" id="reset-right-btn" class="reset-side-btn">🔴 다시 시작</button>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- 3. 드래그 중인 이모지가 올라갈 레이어 -->
-  <div id="drag-container" class="drag-container"></div>
-
-  <!-- 4. 배틀킹 결과 모달 -->
-  <div id="win-modal" class="modal">
-    <div class="modal-content">
-      <div class="win-trophy">🏆</div>
-      <h2 id="win-team-title">BLUE TEAM 승리!</h2>
-      <div class="win-time-desc" id="win-time-desc">축하합니다! 최종 기록:</div>
-      <div class="final-time" id="final-time">00:00.00</div>
-      <div class="modal-buttons">
-        <button type="button" id="modal-replay-btn" class="primary-btn">한 판 더 ⚔️</button>
-        <button type="button" id="modal-setup-btn" class="secondary-btn">설정 변경</button>
+      <!-- 신규 타이머 게이지 바 (오른쪽에서부터 사라지는 형태) -->
+      <div id="timerBarWrap">
+        <div id="timerBarFill"></div>
       </div>
-    </div>
+
+      <!-- 하단 정렬된 플레이어 카드 그리드 -->
+      <div class="pgrid" id="pgrid"></div>
+
+      <!-- 하단 정렬된 입력/자판 구역 -->
+      <div class="game-bottom" id="gameBottom"></div>
+    </section>
+
+    <!-- ===================== RESULT ===================== -->
+    <section id="result" class="hidden">
+      <div class="trophy">🏆</div>
+      <div>
+        <div class="win-name" id="winName">1P</div>
+        <div class="win-sub">우승! 👑 끝말잇킹의 왕이 되었어요</div>
+      </div>
+      <div class="result-stats" id="resultStats"></div>
+      <div class="again">
+        <button class="primary" id="againSame">같은 설정으로 다시</button>
+        <button class="ghost" id="againNew">설정 바꾸기</button>
+      </div>
+    </section>
+
   </div>
 
-  <!-- ----------------------------------
-       [GAME.JS 통합 내장]
-       ---------------------------------- -->
+  <script src="nouns.js"></script>
   <script>
-    const EMOJI_THEMES = {
-      mixed: [
-        '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
-        '🦁', '🐮', '🐷', '🐸', '🐵', '🍎', '🍌', '🍇', '🍓', '🍊',
-        '🍕', '🍔', '🍟', '🍦', '🍩', '⚽', '🏀', '🏈', '⚾', '🎾',
-        '👻', '🎃', '👽', '🤖', '👑', '💎', '🎨', '🚀', '🚗', '🔥'
-      ],
-      animals: [
-        '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
-        '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆',
-        '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋'
-      ],
-      fruits: [
-        '🍎', '🍏', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐',
-        '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑',
-        '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🥔', '🍠', '🧅', '🍄'
-      ],
-      foods: [
-        '🍕', '🍔', '🍟', '🌭', '🥪', '🌮', '🌯', '🍳', '🥘', '🍲',
-        '🥣', '🥗', '🍿', '🥣', '🧂', '🍱', '🍘', '🍙', '🍚', '🍛',
-        '🍜', '🍝', '🍣', '🍤', '🍥', '🍡', '🥟', '🍦', '🍧', '🍩'
-      ],
-      activities: [
-        '⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🎱', '🪀',
-        '🏓', '🏸', '🏒', '🏑', '🥍', '🏹', '🎣', '🤿', '🥊', '🥋',
-        '🛹', '🛼', '🚴', '🤸', '🏂', '🪂', '🎨', '🎬', '🎤', '🎧'
-      ]
-    };
+    "use strict";
 
-    // 2. 효과음 합성 (Web Audio API)
-    const SoundManager = {
-      ctx: null,
+    /* =========================================================
+       한글 조합 (IME) & 두음법칙 유틸
+    ========================================================= */
+    const CHO = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+    const JUNG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+    const JONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 
-      initContext() {
-        try {
-          if (!this.ctx) {
-            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-          }
-          if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
-          }
-        } catch (e) {
-          console.warn("AudioContext init failed:", e);
-        }
-      },
+    const VOWEL_COMBINE = { 'ㅗㅏ': 'ㅘ', 'ㅗㅐ': 'ㅙ', 'ㅗㅣ': 'ㅚ', 'ㅜㅓ': 'ㅝ', 'ㅜㅔ': 'ㅞ', 'ㅜㅣ': 'ㅟ', 'ㅡㅣ': 'ㅢ' };
+    const VOWEL_BASE = { 'ㅘ': 'ㅗ', 'ㅙ': 'ㅗ', 'ㅚ': 'ㅗ', 'ㅝ': 'ㅜ', 'ㅞ': 'ㅜ', 'ㅟ': 'ㅜ', 'ㅢ': 'ㅡ' };
+    const JONG_COMBINE = { 'ㄱㅅ': 'ㄳ', 'ㄴㅈ': 'ㄵ', 'ㄴㅎ': 'ㄶ', 'ㄹㄱ': 'ㄺ', 'ㄹㅁ': 'ㄻ', 'ㄹㅂ': 'ㄼ', 'ㄹㅅ': 'ㄽ', 'ㄹㅌ': 'ㄾ', 'ㄹㅍ': 'ㄿ', 'ㄹㅎ': 'ㅀ', 'ㅂㅅ': 'ㅄ' };
+    const JONG_SPLIT = { 'ㄳ': ['ㄱ', 'ㅅ'], 'ㄵ': ['ㄴ', 'ㅈ'], 'ㄶ': ['ㄴ', 'ㅎ'], 'ㄺ': ['ㄹ', 'ㄱ'], 'ㄻ': ['ㄹ', 'ㅁ'], 'ㄼ': ['ㄹ', 'ㅂ'], 'ㄽ': ['ㄹ', 'ㅅ'], 'ㄾ': ['ㄹ', 'ㅌ'], 'ㄿ': ['ㄹ', 'ㅍ'], 'ㅀ': ['ㄹ', 'ㅎ'], 'ㅄ': ['ㅂ', 'ㅅ'] };
 
-      playTick() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(600, time);
-          
-          gain.gain.setValueAtTime(0.08, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
-          
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          
-          osc.start(time);
-          osc.stop(time + 0.06);
-        } catch (e) {}
-      },
+    function decompose(ch) {
+      const code = ch.charCodeAt(0) - 0xAC00;
+      if (code < 0 || code > 11171) return null;
+      return { cho: Math.floor(code / 588), jung: Math.floor((code % 588) / 28), jong: code % 28 };
+    }
+    function composeIdx(cho, jung, jong) { return String.fromCharCode(0xAC00 + cho * 588 + jung * 28 + jong); }
 
-      playPop() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(480, time);
-          osc.frequency.exponentialRampToValueAtTime(750, time + 0.08);
-          
-          gain.gain.setValueAtTime(0.12, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.08);
-          
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          
-          osc.start(time);
-          osc.stop(time + 0.09);
-        } catch (e) {}
-      },
-
-      playDrop() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(750, time);
-          osc.frequency.exponentialRampToValueAtTime(450, time + 0.12);
-          
-          gain.gain.setValueAtTime(0.15, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
-          
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          
-          osc.start(time);
-          osc.stop(time + 0.13);
-        } catch (e) {}
-      },
-
-      playFail() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(170, time);
-          osc.frequency.linearRampToValueAtTime(90, time + 0.14);
-          
-          gain.gain.setValueAtTime(0.1, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.14);
-          
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          
-          osc.start(time);
-          osc.stop(time + 0.15);
-        } catch (e) {}
-      },
-
-      playReset() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(250, time);
-          osc.frequency.exponentialRampToValueAtTime(900, time + 0.3);
-          
-          gain.gain.setValueAtTime(0.15, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
-          
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          
-          osc.start(time);
-          osc.stop(time + 0.31);
-        } catch (e) {}
-      },
-
-      playComplete() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          [987.77, 1318.51].forEach((freq, idx) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, time + idx * 0.04);
-            
-            gain.gain.setValueAtTime(0.08, time + idx * 0.04);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + idx * 0.04 + 0.3);
-            
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            
-            osc.start(time + idx * 0.04);
-            osc.stop(time + idx * 0.04 + 0.32);
-          });
-        } catch (e) {}
-      },
-
-      playWin() {
-        this.initContext();
-        if (!this.ctx) return;
-        try {
-          const time = this.ctx.currentTime;
-          const melody = [523.25, 659.25, 783.99, 1046.50, 1318.51];
-          
-          melody.forEach((freq, idx) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, time + idx * 0.08);
-            
-            gain.gain.setValueAtTime(0.12, time + idx * 0.08);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + idx * 0.08 + 0.35);
-            
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            
-            osc.start(time + idx * 0.08);
-            osc.stop(time + idx * 0.08 + 0.4);
-          });
-        } catch (e) {}
+    /* 두음법칙 적용기 (단일 문자 반환) */
+    function applyDeum(ch) {
+      const d = decompose(ch); if (!d) return ch;
+      const { cho, jung, jong } = d;
+      if (cho === 5) { // ㄹ
+        if ([2, 6, 7, 12, 17, 20].includes(jung)) return composeIdx(11, jung, jong); // 려→여, 료→요, 류→유, 리→이, 례→예, 랴→야
+        if (jung === 18) return composeIdx(11, jung, jong);                      // 르→으 (늠/음 지원용)
+        return composeIdx(2, jung, jong);                                     // 라→나, 로→노, 루→누 ...
+      } else if (cho === 2) { // ㄴ
+        if ([6, 12, 17, 20].includes(jung)) return composeIdx(11, jung, jong);     // 녀→여, 뇨→요, 뉴→유, 니→이
       }
-    };
-
-    // 3. 게임 전역 상태
-    const state = {
-      difficulty: 'easy',
-      timeLimit: 'infinite',
-      selectedTheme: 'mixed',
-      
-      leftBoard: {
-        beakers: [],
-        completed: new Set(),
-        regions: []
-      },
-      rightBoard: {
-        beakers: [],
-        completed: new Set(),
-        regions: []
-      },
-      
-      leftFinished: false,
-      rightFinished: false,
-      leftClearTime: null,
-      rightClearTime: null,
-      
-      initialBeakersBackup: [],
-      
-      totalBeakersCount: 10,
-      emptyBeakersCount: 2,
-      beakerCapacity: 4, 
-      emojiTypesCount: 4,
-      
-      startTime: null,
-      timerInterval: null,
-      elapsedMs: 0,
-      isGameRunning: false,
-      
-      activeDragPointers: new Map(),
-      animFrameId: null,
-      
-      // 비동기 맵 로딩 상태 플래그
-      mapReady: false
-    };
-
-    let DOM = {};
-
-    function initGame() {
-      try {
-        DOM = {
-          setupScreen: document.getElementById('setup-screen'),
-          countdownScreen: document.getElementById('countdown-screen'),
-          countdownNumber: document.getElementById('countdown-number'),
-          countdownProgressBar: document.getElementById('countdown-progress-bar'),
-          gameScreen: document.getElementById('game-screen'),
-          leftBeakerBoard: document.getElementById('left-beaker-board'),
-          rightBeakerBoard: document.getElementById('right-beaker-board'),
-          leftTeamSide: document.getElementById('left-team-side'),
-          rightTeamSide: document.getElementById('right-team-side'),
-          leftTeamTitle: document.getElementById('left-team-title'),
-          rightTeamTitle: document.getElementById('right-team-title'),
-          dragContainer: document.getElementById('drag-container'),
-          timer: document.getElementById('timer'),
-          timerLabel: document.getElementById('timer-label'),
-          leftCompleted: document.getElementById('left-completed'),
-          leftTotal: document.getElementById('left-total'),
-          rightCompleted: document.getElementById('right-completed'),
-          rightTotal: document.getElementById('right-total'),
-          
-          filledVal: document.getElementById('filled-val'),
-          emptyVal: document.getElementById('empty-val'),
-          emojiVal: document.getElementById('emoji-val'),
-          
-          filledDec: document.getElementById('filled-dec'),
-          filledInc: document.getElementById('filled-inc'),
-          emptyDec: document.getElementById('empty-dec'),
-          emptyInc: document.getElementById('empty-inc'),
-          emojiDec: document.getElementById('emoji-dec'),
-          emojiInc: document.getElementById('emoji-inc'),
-          
-          winModal: document.getElementById('win-modal'),
-          winTeamTitle: document.getElementById('win-team-title'),
-          winTimeDesc: document.getElementById('win-time-desc'),
-          finalTime: document.getElementById('final-time'),
-          
-          startBtn: document.getElementById('start-btn'),
-          otherGameBtn: document.getElementById('other-game-btn'),
-          fullscreenBtn: document.getElementById('fullscreen-btn'),
-          backBtn: document.getElementById('back-btn'),
-          resetLeftBtn: document.getElementById('reset-left-btn'),
-          resetRightBtn: document.getElementById('reset-right-btn'),
-          modalReplayBtn: document.getElementById('modal-replay-btn'),
-          modalSetupBtn: document.getElementById('modal-setup-btn')
-        };
-
-        initSetupEvents();
-        initGameEvents();
-        initElectronBoardGears();
-
-        updateControlUI();
-      } catch (err) {
-        console.error("Critical error in initGame:", err);
-      }
+      return ch;
     }
 
-    if (document.readyState === 'loading') {
-      window.addEventListener('DOMContentLoaded', initGame);
-    } else {
-      initGame();
-    }
-
-    function initElectronBoardGears() {
-      try {
-        const updateViewportHeight = () => {
-          const vh = window.innerHeight * 0.01;
-          document.documentElement.style.setProperty('--vh', `${vh}px`);
-        };
-        window.addEventListener('resize', updateViewportHeight);
-        window.addEventListener('orientationchange', updateViewportHeight);
-        updateViewportHeight();
-
-        window.addEventListener('contextmenu', e => e.preventDefault());
-
-        document.addEventListener('wheel', e => {
-          if (e.ctrlKey) e.preventDefault();
-        }, { passive: false });
-
-        document.addEventListener('gesturestart', e => e.preventDefault());
-        document.addEventListener('gesturechange', e => e.preventDefault());
-
-        let lastTouchTime = 0;
-        document.addEventListener('touchend', e => {
-          const now = Date.now();
-          if (now - lastTouchTime <= 300) {
-            e.preventDefault();
-          }
-          lastTouchTime = now;
-        }, { passive: false });
-
-        const preventSystemGestures = (e) => {
-          if (e.touches && e.touches.length > 1) {
-            if (e.cancelable) {
-              e.preventDefault();
-            }
-          }
-        };
-
-        window.addEventListener('touchstart', preventSystemGestures, { passive: false });
-        window.addEventListener('touchmove', preventSystemGestures, { passive: false });
-        window.addEventListener('touchend', preventSystemGestures, { passive: false });
-        window.addEventListener('touchcancel', preventSystemGestures, { passive: false });
-
-        document.addEventListener('fullscreenchange', () => {
-          if (DOM.fullscreenBtn) {
-            if (document.fullscreenElement) {
-              DOM.fullscreenBtn.textContent = "📴 화면 축소";
-            } else {
-              DOM.fullscreenBtn.textContent = "🖥️ 전체화면";
-            }
-          }
-        });
-      } catch (err) {
-        console.warn("initElectronBoardGears err:", err);
-      }
-    }
-
-    // 4. 설정 화면 이벤트 핸들러
-    function initSetupEvents() {
-      const diffBtns = document.querySelectorAll('#difficulty-options .option-btn');
-      
-      diffBtns.forEach(btn => {
-        btn.addEventListener('pointerdown', () => {
-          SoundManager.initContext();
-          diffBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.difficulty = btn.dataset.value;
-
-          if (state.difficulty === 'easy') {
-            state.totalBeakersCount = 10;
-            state.emptyBeakersCount = 2;
-            state.emojiTypesCount = 4;
-          } else if (state.difficulty === 'normal') {
-            state.totalBeakersCount = 15; 
-            state.emptyBeakersCount = 3;
-            state.emojiTypesCount = 6;     
-          } else if (state.difficulty === 'hard') {
-            state.totalBeakersCount = 24; 
-            state.emptyBeakersCount = 4;
-            state.emojiTypesCount = 10;    
-          } else if (state.difficulty === 'veryhard') {
-            state.totalBeakersCount = 35;
-            state.emptyBeakersCount = 5;
-            state.emojiTypesCount = 15;
-          } else if (state.difficulty === 'insane') {
-            state.totalBeakersCount = 48;
-            state.emptyBeakersCount = 6;
-            state.emojiTypesCount = 20;
-          } else if (state.difficulty === 'impossible') {
-            state.totalBeakersCount = 60;
-            state.emptyBeakersCount = 6;
-            state.emojiTypesCount = 24;
-          }
-
-          updateControlUI();
-        });
-      });
-
-      const adjustVal = (type, delta) => {
-        SoundManager.initContext();
-        diffBtns.forEach(b => b.classList.remove('active'));
-        state.difficulty = 'custom'; 
-
-        if (type === 'total') {
-          state.totalBeakersCount = Math.max(4, Math.min(60, state.totalBeakersCount + delta));
-          
-          if (state.totalBeakersCount - state.emptyBeakersCount < 2) {
-            state.emptyBeakersCount = state.totalBeakersCount - 2;
-          }
-          
-          const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-          if (state.emojiTypesCount > filledCount) {
-            state.emojiTypesCount = filledCount;
-          }
-        } 
-        else if (type === 'empty') {
-          const newEmpty = state.emptyBeakersCount + delta;
-          if (state.totalBeakersCount - newEmpty >= 2) {
-            state.emptyBeakersCount = Math.max(1, Math.min(15, newEmpty));
-          }
-          
-          const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-          if (state.emojiTypesCount > filledCount) {
-            state.emojiTypesCount = filledCount;
-          }
-        } 
-        else if (type === 'emoji') {
-          const newEmoji = state.emojiTypesCount + delta;
-          const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-          
-          if (newEmoji <= filledCount) {
-            state.emojiTypesCount = Math.max(2, Math.min(24, newEmoji));
-          }
-        }
-
-        updateControlUI();
-      };
-
-      DOM.filledDec.addEventListener('pointerdown', () => adjustVal('total', -1));
-      DOM.filledInc.addEventListener('pointerdown', () => adjustVal('total', 1));
-      DOM.emptyDec.addEventListener('pointerdown', () => adjustVal('empty', -1));
-      DOM.emptyInc.addEventListener('pointerdown', () => adjustVal('empty', 1));
-      DOM.emojiDec.addEventListener('pointerdown', () => adjustVal('emoji', -1));
-      DOM.emojiInc.addEventListener('pointerdown', () => adjustVal('emoji', 1));
-
-      const timeBtns = document.querySelectorAll('#time-options .option-btn');
-      timeBtns.forEach(btn => {
-        btn.addEventListener('pointerdown', () => {
-          SoundManager.initContext();
-          timeBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.timeLimit = btn.dataset.value;
-        });
-      });
-
-      const themeBtns = document.querySelectorAll('.theme-btn');
-      themeBtns.forEach(btn => {
-        btn.addEventListener('pointerdown', () => {
-          SoundManager.initContext();
-          themeBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.selectedTheme = btn.dataset.theme;
-        });
-      });
-
-      if (DOM.startBtn) {
-        DOM.startBtn.addEventListener('pointerdown', () => {
-          SoundManager.initContext();
-          triggerCountdownSequence(); 
-        });
-      }
-
-      if (DOM.otherGameBtn) {
-        DOM.otherGameBtn.addEventListener('pointerdown', () => {
-          SoundManager.initContext();
-          window.open('https://킹수학.com', '_blank');
-        });
-      }
-    }
-
-    function updateControlUI() {
-      DOM.filledVal.textContent = state.totalBeakersCount;
-      DOM.emptyVal.textContent = state.emptyBeakersCount;
-      DOM.emojiVal.textContent = state.emojiTypesCount;
-    }
-
-    // 5. 게임 플레이 화면 이벤트 핸들러
-    function initGameEvents() {
-      if (DOM.backBtn) {
-        DOM.backBtn.addEventListener('pointerdown', () => {
-          showSetupScreen();
-        });
-      }
-      
-      if (DOM.resetLeftBtn) {
-        DOM.resetLeftBtn.addEventListener('pointerdown', () => {
-          resetSideBoard('left');
-        });
-      }
-      if (DOM.resetRightBtn) {
-        DOM.resetRightBtn.addEventListener('pointerdown', () => {
-          resetSideBoard('right');
-        });
-      }
-      
-      if (DOM.modalReplayBtn) {
-        DOM.modalReplayBtn.addEventListener('pointerdown', () => {
-          closeWinModal();
-          triggerCountdownSequence(); 
-        });
-      }
-      if (DOM.modalSetupBtn) {
-        DOM.modalSetupBtn.addEventListener('pointerdown', () => {
-          closeWinModal();
-          showSetupScreen();
-        });
-      }
-
-      if (DOM.leftBeakerBoard) {
-        DOM.leftBeakerBoard.addEventListener('pointerdown', e => onPointerDown(e, 'left'));
-      }
-      if (DOM.rightBeakerBoard) {
-        DOM.rightBeakerBoard.addEventListener('pointerdown', e => onPointerDown(e, 'right'));
-      }
-
-      if (DOM.fullscreenBtn) {
-        DOM.fullscreenBtn.addEventListener('pointerdown', () => {
-          SoundManager.initContext();
-          toggleFullscreen();
-        });
-      }
-
-      window.addEventListener('pointermove', onPointerMove);
-      window.addEventListener('pointerup', onPointerUp);
-      window.addEventListener('pointercancel', onPointerCancel);
-    }
-
-    // **[이중 안전 설계 (Dual-Safety Beaker System) 가동]**
-    function triggerCountdownSequence() {
-      try {
-        // 즉시 스크린 교환으로 렉 0% 가동
-        if (DOM.setupScreen) DOM.setupScreen.classList.remove('active');
-        if (DOM.gameScreen) DOM.gameScreen.classList.remove('active');
-        if (DOM.countdownScreen) DOM.countdownScreen.classList.add('active');
-
-        DOM.countdownProgressBar.style.transition = 'none';
-        DOM.countdownProgressBar.style.width = '0%';
-
-        let remainCount = 5;
-        DOM.countdownNumber.textContent = remainCount;
-        DOM.countdownNumber.style.transform = 'scale(1.3)';
-        setTimeout(() => {
-          DOM.countdownNumber.style.transform = 'scale(1)';
-        }, 150);
-
-        SoundManager.playTick();
-
-        setTimeout(() => {
-          DOM.countdownProgressBar.style.transition = 'width 5s linear';
-          DOM.countdownProgressBar.style.width = '100%';
-        }, 50);
-
-        state.leftFinished = false;
-        state.rightFinished = false;
-        state.leftClearTime = null;
-        state.rightClearTime = null;
-        state.mapReady = false; // 준비 플래그 리셋
-
-        DOM.leftTeamSide.classList.remove('finished-wait');
-        DOM.rightTeamSide.classList.remove('finished-wait');
-        DOM.leftTeamTitle.textContent = "🔵 BLUE TEAM";
-        DOM.rightTeamTitle.textContent = "🔴 RED TEAM";
-
-        const root = document.documentElement;
-        root.style.setProperty('--beaker-capacity', state.beakerCapacity);
-
-        const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-        if (DOM.leftTotal) DOM.leftTotal.textContent = filledCount;
-        if (DOM.rightTotal) DOM.rightTotal.textContent = filledCount;
-
-        // 비동기 병렬 연산 시작
-        asyncGenerateMap((readyBeakers) => {
-          state.initialBeakersBackup = JSON.parse(JSON.stringify(readyBeakers));
-          state.leftBoard.beakers = JSON.parse(JSON.stringify(readyBeakers));
-          state.rightBoard.beakers = JSON.parse(JSON.stringify(readyBeakers));
-
-          checkCompletedBeakers('left');
-          checkCompletedBeakers('right');
-          updateProgressUI('left');
-          updateProgressUI('right');
-
-          state.mapReady = true; // 로드 완료 표시
-        });
-
-        // 1초 주기의 카운트다운 인터벌
-        const countdownTimer = setInterval(() => {
-          remainCount--;
-          
-          if (remainCount > 0) {
-            DOM.countdownNumber.textContent = remainCount;
-            DOM.countdownNumber.style.transform = 'scale(1.3)';
-            setTimeout(() => {
-              DOM.countdownNumber.style.transform = 'scale(1)';
-            }, 120);
-
-            SoundManager.playTick();
-          } 
-          else if (remainCount === 0) {
-            DOM.countdownNumber.textContent = "시작! ⚔️";
-            DOM.countdownNumber.style.transform = 'scale(1.4)';
-            SoundManager.playPop();
-          } 
-          else {
-            clearInterval(countdownTimer);
-            
-            if (DOM.countdownScreen) DOM.countdownScreen.classList.remove('active');
-            if (DOM.gameScreen) DOM.gameScreen.classList.add('active');
-
-            // [이중 안전장치]: 만약 카운트다운이 마감되었는데 아직 비동기 맵 로딩이 완료되지 않았다면,
-            // 더 이상 대기하지 않고 동기식 폴백 알고리즘을 즉석에서 강제 시동하여 비커 채우기 완료!
-            if (!state.mapReady || !state.leftBoard.beakers || state.leftBoard.beakers.length === 0) {
-              console.warn("Safety trigger: Async load was incomplete. Forcing immediate sync map.");
-              const themePool = EMOJI_THEMES[state.selectedTheme] || EMOJI_THEMES.mixed;
-              const selectedEmojis = shuffleArray([...themePool]).slice(0, state.emojiTypesCount);
-              const fallbackBeakers = generateSolvableBeakers(filledCount, state.emptyBeakersCount, state.beakerCapacity, selectedEmojis);
-              
-              state.initialBeakersBackup = JSON.parse(JSON.stringify(fallbackBeakers));
-              state.leftBoard.beakers = JSON.parse(JSON.stringify(fallbackBeakers));
-              state.rightBoard.beakers = JSON.parse(JSON.stringify(fallbackBeakers));
-
-              checkCompletedBeakers('left');
-              checkCompletedBeakers('right');
-              updateProgressUI('left');
-              updateProgressUI('right');
-              
-              state.mapReady = true;
-            }
-
-            // 렌더링 드로잉
-            DOM.leftBeakerBoard.innerHTML = '';
-            DOM.rightBeakerBoard.innerHTML = '';
-            renderBeakers('left');
-            renderBeakers('right');
-
-            startTimer();
-            startRenderLoop();
-          }
-        }, 1000);
-
-      } catch (err) {
-        console.error("Countdown sequence error:", err);
-        showSetupScreen();
-      }
-    }
-
-    // 비동기 맵 로더 (프레임당 청크 시도 횟수를 5회로 상향하여 맵 완성 속도 가속화)
-    function asyncGenerateMap(onSuccess) {
-      try {
-        let attempts = 0;
-        const maxAttempts = 100;
-        const themePool = EMOJI_THEMES[state.selectedTheme] || EMOJI_THEMES.mixed;
-        const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-        const emptyCount = state.emptyBeakersCount;
-        const capacity = state.beakerCapacity;
-        const selectedEmojis = shuffleArray([...themePool]).slice(0, state.emojiTypesCount);
-
-        const tick = () => {
-          // 1프레임당 5회씩 병렬 시도하여 로딩 타임을 1/5 수준(0.05초)으로 압축!
-          for (let chunk = 0; chunk < 5; chunk++) {
-            attempts++;
-            
-            if (attempts > maxAttempts) {
-              const fallback = generateSolvableBeakers(filledCount, emptyCount, capacity, selectedEmojis);
-              onSuccess(fallback);
-              return;
-            }
-
-            const emojiDistribution = [];
-            for (let i = 0; i < filledCount; i++) {
-              const emoji = selectedEmojis[i % selectedEmojis.length];
-              for (let c = 0; c < capacity; c++) {
-                emojiDistribution.push(emoji);
-              }
-            }
-            shuffleArray(emojiDistribution);
-
-            const candidateBeakers = [];
-            for (let i = 0; i < filledCount; i++) {
-              candidateBeakers.push(emojiDistribution.slice(i * capacity, (i + 1) * capacity));
-            }
-            for (let i = 0; i < emptyCount; i++) {
-              candidateBeakers.push([]);
-            }
-            shuffleArray(candidateBeakers);
-
-            if (state.totalBeakersCount <= 24) {
-              if (solveWaterSort(candidateBeakers)) {
-                onSuccess(candidateBeakers);
-                return;
-              }
-            } else {
-              onSuccess(candidateBeakers);
-              return;
-            }
-          }
-
-          requestAnimationFrame(tick);
-        };
-
-        requestAnimationFrame(tick);
-      } catch (e) {
-        console.error("asyncGenerateMap error:", e);
-        onSuccess(generateSolvableBeakers(
-          state.totalBeakersCount - state.emptyBeakersCount,
-          state.emptyBeakersCount,
-          state.beakerCapacity,
-          shuffleArray([...(EMOJI_THEMES[state.selectedTheme] || EMOJI_THEMES.mixed)]).slice(0, state.emojiTypesCount)
-        ));
-      }
-    }
-
-    function resetSideBoard(side) {
-      try {
-        if (side === 'left' && state.leftFinished) return;
-        if (side === 'right' && state.rightFinished) return;
-
-        SoundManager.playReset();
-        const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-        
-        boardData.beakers = JSON.parse(JSON.stringify(state.initialBeakersBackup));
-        boardData.completed.clear();
-        
-        renderBeakers(side);
-        checkCompletedBeakers(side);
-        updateProgressUI(side);
-      } catch (err) {
-        console.error("Error in resetSideBoard:", err);
-      }
-    }
-
-    function showSetupScreen() {
-      stopTimer();
-      stopRenderLoop();
-      state.isGameRunning = false;
-      if (DOM.gameScreen) DOM.gameScreen.classList.remove('active');
-      if (DOM.countdownScreen) DOM.countdownScreen.classList.remove('active');
-      if (DOM.setupScreen) DOM.setupScreen.classList.add('active');
-    }
-
-    function generateSolvableBeakers(filledCount, emptyCount, capacity, selectedEmojis) {
-      const emojiDistribution = [];
-      for (let i = 0; i < filledCount; i++) {
-        const emoji = selectedEmojis[i % selectedEmojis.length];
-        for (let c = 0; c < capacity; c++) {
-          emojiDistribution.push(emoji);
-        }
-      }
-      shuffleArray(emojiDistribution);
-
-      const beakers = [];
-      for (let i = 0; i < filledCount; i++) {
-        beakers.push(emojiDistribution.slice(i * capacity, (i + 1) * capacity));
-      }
-      for (let i = 0; i < emptyCount; i++) {
-        beakers.push([]);
-      }
-
-      shuffleArray(beakers);
-
-      return beakers;
-    }
-
-    function initGameData() {
-      try {
-        state.leftBoard.completed.clear();
-        state.rightBoard.completed.clear();
-        state.activeDragPointers.clear();
-        if (DOM.dragContainer) DOM.dragContainer.innerHTML = '';
-        
-        const themePool = EMOJI_THEMES[state.selectedTheme] || EMOJI_THEMES.mixed;
-        const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-        const emptyCount = state.emptyBeakersCount;
-        const capacity = state.beakerCapacity;
-
-        let finalBeakers = [];
-        let attempts = 0;
-        const maxAttempts = 100;
-
-        const selectedEmojis = shuffleArray([...themePool]).slice(0, state.emojiTypesCount);
-
-        while (attempts < maxAttempts) {
-          attempts++;
-
-          const emojiDistribution = [];
-          for (let i = 0; i < filledCount; i++) {
-            const emoji = selectedEmojis[i % selectedEmojis.length];
-            for (let c = 0; c < capacity; c++) {
-              emojiDistribution.push(emoji);
-            }
-          }
-
-          shuffleArray(emojiDistribution);
-
-          const candidateBeakers = [];
-          for (let i = 0; i < filledCount; i++) {
-            candidateBeakers.push(emojiDistribution.slice(i * capacity, (i + 1) * capacity));
-          }
-
-          for (let i = 0; i < emptyCount; i++) {
-            candidateBeakers.push([]);
-          }
-
-          shuffleArray(candidateBeakers);
-
-          if (state.totalBeakersCount <= 24) {
-            if (solveWaterSort(candidateBeakers)) {
-              finalBeakers = candidateBeakers;
-              break;
-            }
-          } else {
-            finalBeakers = candidateBeakers;
-            break;
-          }
-        }
-
-        if (finalBeakers.length === 0) {
-          finalBeakers = generateSolvableBeakers(filledCount, emptyCount, capacity, selectedEmojis);
-        }
-
-        state.initialBeakersBackup = JSON.parse(JSON.stringify(finalBeakers));
-
-        state.leftBoard.beakers = JSON.parse(JSON.stringify(finalBeakers));
-        state.rightBoard.beakers = JSON.parse(JSON.stringify(finalBeakers));
-
-        checkCompletedBeakers('left');
-        checkCompletedBeakers('right');
-        updateProgressUI('left');
-        updateProgressUI('right');
-      } catch (err) {
-        console.error("Error in initGameData:", err);
-      }
-    }
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    // 7. 보드 렌더링 및 캐싱
-    function renderBeakers(side) {
-      try {
-        const boardEl = side === 'left' ? DOM.leftBeakerBoard : DOM.rightBeakerBoard;
-        if (!boardEl) return;
-
-        const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-        const totalBeakers = boardData.beakers.length;
-        let cols = Math.min(12, totalBeakers);
-
-        boardEl.style.gridTemplateColumns = `repeat(${cols}, var(--beaker-width))`;
-        adjustBeakerSizeForSide(totalBeakers, cols);
-
-        const beakerEls = boardEl.querySelectorAll('.beaker');
-
-        if (beakerEls.length === totalBeakers) {
-          boardData.beakers.forEach((beaker, index) => {
-            const beakerEl = beakerEls[index];
-            
-            if (beaker.length > 0) {
-              beakerEl.classList.add('filled');
-            } else {
-              beakerEl.classList.remove('filled');
-            }
-
-            if (boardData.completed.has(index)) {
-              beakerEl.classList.add('completed');
-            } else {
-              beakerEl.classList.remove('completed');
-            }
-
-            const existingSlots = beakerEl.querySelectorAll('.emoji-slot');
-            const newSize = beaker.length;
-
-            existingSlots.forEach((slotEl, slotIdx) => {
-              if (slotIdx < newSize) {
-                slotEl.textContent = beaker[slotIdx];
-                slotEl.style.opacity = '1';
-                slotEl.classList.remove('dragging-out');
-              } else {
-                slotEl.textContent = '';
-                slotEl.style.opacity = '0';
-                slotEl.classList.remove('dragging-out');
-              }
-            });
-          });
+    /* 두음법칙 변이 집합 (역행 방지 포함) */
+    /* 두음법칙 변이 집합 (역행 방지 포함) */
+    function deumVariants(ch) {
+      const d = decompose(ch); if (!d) return [ch];
+      const { cho, jung, jong } = d;
+      const out = new Set();
+      out.add(ch); // 원본 글자는 항상 후보에 포함
+      if (cho === 5) { // ㄹ
+        if ([2, 6, 7, 12, 17, 20].includes(jung)) {
+          out.add(composeIdx(11, jung, jong)); // 려→여, 료→요, 류→유, 리→이, 례→예, 랴→야
+        } else if (jung === 18) {
+          out.add(composeIdx(2, jung, jong));  // 느 (늠)
+          out.add(composeIdx(11, jung, jong)); // 으 (음)
         } else {
-          boardEl.innerHTML = '';
-          boardData.beakers.forEach((beaker, index) => {
-            const beakerEl = document.createElement('div');
-            beakerEl.className = 'beaker';
-            beakerEl.dataset.index = index;
-            
-            if (beaker.length > 0) {
-              beakerEl.classList.add('filled');
-            }
-            
-            if (boardData.completed.has(index)) {
-              beakerEl.classList.add('completed');
-            }
+          out.add(composeIdx(2, jung, jong));  // 라→나, 로→노, 루→누 ...
+        }
+      } else if (cho === 2) { // ㄴ
+        if ([6, 12, 17, 20].includes(jung)) {
+          out.add(composeIdx(11, jung, jong)); // 녀→여, 뇨→요, 뉴→유, 니→이
+        } else if (jung === 18) {
+          out.add(composeIdx(11, jung, jong)); // 느→으 (늠/음 지원용)
+        }
+      } else if (cho === 11 && jung === 18) { // ㅇ + ㅡ
+        out.add(composeIdx(2, jung, jong));  // 으→느 (음→늠 지원용)
+      }
+      return [...out];
+    }
 
-            for (let slotIdx = 0; slotIdx < state.beakerCapacity; slotIdx++) {
-              const slotEl = document.createElement('div');
-              slotEl.className = 'emoji-slot';
-              if (slotIdx < beaker.length) {
-                slotEl.textContent = beaker[slotIdx];
+    class Hangul {
+      constructor() { this.reset(); }
+      reset() { this.committed = ''; this.cho = -1; this.jung = -1; this.jong = 0; }
+      currentChar() {
+        if (this.cho >= 0 && this.jung >= 0) return composeIdx(this.cho, this.jung, this.jong);
+        if (this.cho >= 0) return CHO[this.cho];
+        if (this.jung >= 0) return JUNG[this.jung];
+        return '';
+      }
+      get text() { return this.committed + this.currentChar(); }
+      commit() { this.committed += this.currentChar(); this.cho = -1; this.jung = -1; this.jong = 0; }
+      input(jamo) {
+        const vi = JUNG.indexOf(jamo);
+        if (vi >= 0) { // vowel
+          if (this.jong > 0) {
+            const jc = JONG[this.jong];
+            if (JONG_SPLIT[jc]) {
+              const [rem, mv] = JONG_SPLIT[jc];
+              this.jong = JONG.indexOf(rem); this.commit();
+              this.cho = CHO.indexOf(mv); this.jung = vi; this.jong = 0;
+            } else {
+              const mv = CHO.indexOf(jc); this.jong = 0; this.commit();
+              this.cho = mv; this.jung = vi; this.jong = 0;
+            }
+          } else if (this.jung >= 0) {
+            const key = JUNG[this.jung] + jamo;
+            if (VOWEL_COMBINE[key]) this.jung = JUNG.indexOf(VOWEL_COMBINE[key]);
+            else { this.commit(); this.cho = -1; this.jung = vi; this.jong = 0; }
+          } else { this.jung = vi; }
+        } else { // consonant
+          if (this.cho < 0 && this.jung < 0) { this.cho = CHO.indexOf(jamo); }
+          else if (this.jung < 0) { this.commit(); this.cho = CHO.indexOf(jamo); }
+          else if (this.jong === 0) {
+            const ji = JONG.indexOf(jamo);
+            if (ji > 0) this.jong = ji;
+            else { this.commit(); this.cho = CHO.indexOf(jamo); }
+          } else {
+            const comb = JONG_COMBINE[JONG[this.jong] + jamo];
+            if (comb) this.jong = JONG.indexOf(comb);
+            else { this.commit(); this.cho = CHO.indexOf(jamo); }
+          }
+        }
+      }
+      backspace() {
+        if (this.jong > 0) {
+          const jc = JONG[this.jong];
+          this.jong = JONG_SPLIT[jc] ? JONG.indexOf(JONG_SPLIT[jc][0]) : 0;
+        } else if (this.jung >= 0) {
+          const b = VOWEL_BASE[JUNG[this.jung]];
+          this.jung = b ? JUNG.indexOf(b) : -1;
+        } else if (this.cho >= 0) { this.cho = -1; }
+        else if (this.committed.length > 1) { this.committed = this.committed.slice(0, -1); }
+      }
+    }
+
+    /* =========================================================
+       쉬운 제시어 100개 하드코딩
+     ========================================================= */
+    const EASY_SEEDS = [
+      '가방', '나무', '사람', '학교', '하늘', '바다', '사과', '수박', '모자', '안경',
+      '자전거', '우산', '시계', '의자', '책상', '공책', '필통', '연필', '가위', '거울',
+      '바지', '치마', '구두', '신발', '양말', '장갑', '이불', '베개', '비누', '치약',
+      '칫솔', '수건', '지갑', '냄비', '소파', '침대', '옷장', '화분', '꽃병', '지우개',
+      '인형', '로봇', '줄넘기', '그네', '시소', '모래', '자갈', '조개', '소라', '고래',
+      '상어', '거북이', '문어', '오징어', '새우', '꽃게', '호랑이', '사자', '토끼', '여우',
+      '원숭이', '코끼리', '기린', '사슴', '강아지', '고양이', '돼지', '오리', '닭장', '나비',
+      '벌레', '거미', '낙타', '양파', '당근', '오이', '감자', '고구마', '고추', '자두',
+      '레몬', '포도', '바나나', '딸기', '수수', '우유', '보석', '구름', '눈물', '눈사람',
+      '선풍기', '전화기', '라디오', '사진', '액자', '단추', '열쇠', '편지', '풍선', '과자'
+    ];
+
+    let offlineNounsList = [];
+    if (typeof OFFLINE_NOUNS !== 'undefined') {
+      offlineNounsList = OFFLINE_NOUNS.split(' ');
+    } else {
+      offlineNounsList = EASY_SEEDS;
+    }
+    const DICT = new Set(offlineNounsList.filter(w => w && w.length <= 5));
+    const DICT_ARR = [...DICT];
+    // 첫 글자 색인
+    const BY_FIRST = {};
+    for (const w of DICT_ARR) { (BY_FIRST[w[0]] ||= []).push(w); }
+    function continuationsFor(ch) {
+      let list = [];
+      for (const v of deumVariants(ch)) if (BY_FIRST[v]) list = list.concat(BY_FIRST[v]);
+      return list;
+    }
+
+    /* =========================================================
+       상태
+    ========================================================= */
+    const P_COLORS = ['#ff5d73', '#4d8bff', '#37c26b', '#ff9f2e', '#a361ff', '#18c5c9'];
+    const cfg = { count: 3, time: 20, mode: 'keypad', elim: 'out', hearts: 3, names: [] };
+    let G = null; // 게임 상태
+
+    const $ = s => document.querySelector(s);
+    const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
+
+    /* =========================================================
+       사운드 & TTS 발음 재생
+    ========================================================= */
+    let AC = null;
+    function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+    function beep(freq, dur, type = 'sine', vol = 0.15) {
+      const c = ac(); if (!c) return;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.value = freq; o.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(vol, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+      o.start(); o.stop(c.currentTime + dur);
+    }
+    const sfxKey = () => beep(520, 0.05, 'square', 0.06);
+    const sfxOk = () => { beep(660, 0.09, 'sine', 0.16); setTimeout(() => beep(990, 0.14, 'sine', 0.16), 90); };
+    const sfxErr = () => { beep(180, 0.18, 'sawtooth', 0.14); };
+    const sfxTick = () => beep(880, 0.05, 'sine', 0.10);
+    const sfxWin = () => { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.18, 'triangle', 0.18), i * 130)); };
+
+    /* 브라우저 TTS 한국어 발음 재생 */
+    function speak(text) {
+      if (!window.speechSynthesis) return;
+      try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ko-KR';
+        u.rate = 0.95;
+        u.pitch = 1.0;
+        window.speechSynthesis.speak(u);
+      } catch (e) { }
+    }
+
+    /* 중앙 전광판 스크택스트 동기화 */
+    function updateCenterScreen(type, word, color) {
+      const label = $('#screenLabel');
+      const wordEl = $('#screenWord');
+      const screen = $('#centerScreen');
+
+      if (type === 'seed') {
+        label.textContent = '제시어';
+        wordEl.textContent = word + '!';
+        screen.style.setProperty('--pcol', 'var(--gold)');
+      } else {
+        const pName = G ? G.players[G.cur].name : '';
+        label.textContent = pName ? pName + ' 성공!' : '최근 성공 단어';
+        wordEl.textContent = word + '!';
+        screen.style.setProperty('--pcol', color || '#fff');
+      }
+    }
+
+    /* 중앙 전광판 내 팝업 연출 및 TTS 재생 */
+    function showWordOverlay(type, word, color, callback) {
+      updateCenterScreen(type, word, color);
+
+      const wordEl = $('#screenWord');
+      wordEl.classList.remove('pop');
+      void wordEl.offsetWidth; // Reflow 트리거
+      wordEl.classList.add('pop');
+
+      const ttsText = type === 'seed' ? '제시어 ' + word : word;
+      speak(ttsText);
+
+      stopTimer(); // 연출 시간 동안 타이머 일시정지
+      setTimeout(() => {
+        if (callback) callback();
+      }, 1500);
+    }
+
+    /* =========================================================
+       SETUP 화면
+    ========================================================= */
+    function buildSetup() {
+      const pc = $('#playerCount'); pc.innerHTML = '';
+      for (let n = 2; n <= 6; n++) {
+        const b = el('button', 'chip' + (n === cfg.count ? ' on' : '')); b.textContent = n + '인'; b.dataset.n = n;
+        b.onclick = () => { cfg.count = n; buildSetup(); };
+        pc.appendChild(b);
+      }
+    }
+    $('#timeOpt').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; cfg.time = +b.dataset.t; sel('#timeOpt', b); };
+    $('#elimMode').onclick = e => {
+      const b = e.target.closest('.chip'); if (!b) return; cfg.elim = b.dataset.e; sel('#elimMode', b);
+      $('#heartRow').classList.toggle('hidden', cfg.elim !== 'heart');
+    };
+    $('#heartCount').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; cfg.hearts = +b.dataset.h; sel('#heartCount', b); };
+    function sel(container, btn) { document.querySelectorAll(container + ' .chip').forEach(c => c.classList.remove('on')); btn.classList.add('on'); }
+    $('#startBtn').onclick = () => { ac(); startGame(); };
+
+    /* =========================================================
+       우리말샘 오픈 API (단어 검증)
+    ========================================================= */
+    const URIMAL_KEY = '8F102F8109E1CA5966761BC6E88A5ED8';
+    async function urimalFetch(word) {
+      const targetUrl = 'https://opendict.korean.go.kr/api/search?key=' + URIMAL_KEY
+        + '&q=' + encodeURIComponent(word) + '&req_type=json&advanced=y&method=exact&num=10';
+      const url = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl);
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 4000);
+      try {
+        const res = await fetch(url, { signal: ctrl.signal });
+        clearTimeout(to);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        return { ok: true, data };
+      } catch (e) { clearTimeout(to); return { ok: false, error: e }; }
+    }
+    function urimalAnalyze(data, word) {
+      const ch = data && data.channel;
+      let items = ch && ch.item ? (Array.isArray(ch.item) ? ch.item : [ch.item]) : [];
+      const norm = s => String(s || '').replace(/[^가-힣]/g, '');
+      const exact = items.filter(it => norm(it.word) === word);
+      if (!exact.length) return { found: false };
+      let sawPos = false, noun = false, proper = false;
+      for (const it of exact) {
+        const poss = [];
+        if (it.pos) poss.push(it.pos);
+        const senses = it.sense ? (Array.isArray(it.sense) ? it.sense : [it.sense]) : [];
+        for (const s of senses) { if (s && s.pos) poss.push(s.pos); }
+        for (let p of poss) {
+          p = String(p);
+          if (p.trim()) {
+            sawPos = true;
+            if (p.indexOf('명사') >= 0) {
+              if (p.indexOf('고유') >= 0 || p.indexOf('지명') >= 0 || p.indexOf('인명') >= 0) {
+                proper = true;
               } else {
-                slotEl.textContent = '';
-                slotEl.style.opacity = '0';
+                noun = true;
               }
-              slotEl.dataset.slotIndex = slotIdx;
-              beakerEl.appendChild(slotEl);
             }
-
-            boardEl.appendChild(beakerEl);
-          });
+          }
         }
-
-        cacheBeakerRegions(side);
-      } catch (err) {
-        console.error("Error in renderBeakers:", err);
       }
+      if (noun) return { found: true, noun: true };
+      if (proper) return { found: true, noun: false, proper: true };
+      if (!sawPos) return { found: true, noun: true };
+      return { found: true, noun: false };
+    }
+    async function checkWord(word) {
+      if (DICT.has(word)) return { ok: true, source: 'offline' };
+      const r = await urimalFetch(word);
+      if (r.ok) {
+        const a = urimalAnalyze(r.data, word);
+        if (a.found && a.noun) return { ok: true, source: 'online' };
+        if (a.found && a.proper) return { ok: false, reason: '고유명사(인명, 지명 등)는 사용할 수 없어요', source: 'online' };
+        if (a.found && !a.noun) return { ok: false, reason: '명사가 아니에요 (우리말샘)', source: 'online' };
+        return { ok: false, reason: '우리말샘에 없는 단어예요', source: 'online' };
+      }
+      return { ok: false, reason: '사전에 없는 단어예요 (오프라인)', source: 'offline' };
     }
 
-    function adjustBeakerSizeForSide(totalBeakers, cols) {
-      const root = document.documentElement;
-      
-      const boardEl = DOM.leftBeakerBoard || document.getElementById('left-beaker-board');
-      const boardHeight = (boardEl && boardEl.clientHeight > 100)
-        ? boardEl.clientHeight - 8
-        : window.innerHeight - 130;
-
-      const boardWidth = (window.innerWidth / 2) - 30;
-
-      let beakerWidth = Math.floor(boardWidth / cols) - 10;
-      beakerWidth = Math.max(46, Math.min(64, beakerWidth)); 
-      
-      const rows = Math.ceil(totalBeakers / cols);
-      let beakerHeight = Math.floor(boardHeight / rows) - 12; 
-      beakerHeight = Math.max(70, Math.min(195, beakerHeight)); 
-
-      const emojiSize = Math.max(16, Math.min(36, Math.floor(beakerWidth * 0.72)));
-
-      root.style.setProperty('--beaker-width', `${beakerWidth}px`);
-      root.style.setProperty('--beaker-height', `${beakerHeight}px`);
-      root.style.setProperty('--emoji-size', `${emojiSize}px`);
-    }
-
-    function cacheBeakerRegions(side) {
-      const boardEl = side === 'left' ? DOM.leftBeakerBoard : DOM.rightBeakerBoard;
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-      if (!boardEl) return;
-
-      boardData.regions = [];
-      const beakerEls = boardEl.querySelectorAll('.beaker');
-      beakerEls.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        boardData.regions.push({
-          index: parseInt(el.dataset.index, 10),
-          left: rect.left,
-          right: rect.right,
-          top: rect.top,
-          bottom: rect.bottom,
-          element: el
+    /* =========================================================
+       게임 시작 / 진행
+    ========================================================= */
+    function startGame() {
+      const players = [];
+      for (let i = 0; i < cfg.count; i++) {
+        players.push({
+          id: i, name: (i + 1) + '번',
+          color: P_COLORS[i], hearts: cfg.hearts, out: false, lastWord: ''
         });
+      }
+      const seed = EASY_SEEDS[(Math.random() * EASY_SEEDS.length) | 0];
+
+      G = {
+        players, time: cfg.time, elim: cfg.elim,
+        cur: (Math.random() * players.length) | 0,
+        used: new Set([seed]),
+        chain: [{ type: 'seed', word: seed }],
+        reqChar: applyDeum(seed[seed.length - 1]),
+        turns: 0, timer: null, remain: 0, composer: new Hangul(),
+        kbShift: false, checking: false, warnedOffline: false, seed
+      };
+      $('#setup').classList.add('hidden');
+      $('#result').classList.add('hidden');
+      $('#game').classList.remove('hidden');
+      renderChain();
+
+      // 첫 제시어 팝업 연출 후 턴 시작
+      showWordOverlay('seed', seed, null, () => {
+        startTurn();
       });
     }
+    function aliveIdx() { return G.players.map((p, i) => p.out ? -1 : i).filter(i => i >= 0); }
+    function nextAlive(from) { const n = G.players.length; for (let k = 1; k <= n; k++) { const i = (from + k) % n; if (!G.players[i].out) return i; } return from; }
 
-    window.addEventListener('resize', () => {
-      if (state.isGameRunning) {
-        const totalBeakers = state.totalBeakersCount;
-        let cols = Math.min(12, totalBeakers);
-        adjustBeakerSizeForSide(totalBeakers, cols);
-        setTimeout(() => {
-          cacheBeakerRegions('left');
-          cacheBeakerRegions('right');
-        }, 200);
+    function startTurn() {
+      G.composer.reset();
+      G.composer.committed = G.reqChar; // 첫 글자 기본 입력 처리
+      G.kbShift = false; G.checking = false;
+      renderGrid();
+      startTimer(true);
+    }
+
+    /* ---------- 타이머 ---------- */
+    function startTimer(reset) {
+      stopTimer();
+      const wrap = $('#timerBarWrap');
+      if (G.time === 0) { wrap.style.display = 'none'; return; }
+      wrap.style.display = '';
+      if (reset) G.remain = G.time;
+      updateTimerUI();
+      G.timer = setInterval(() => {
+        G.remain -= 0.1;
+        if (G.remain > 0 && Math.abs(G.remain - Math.round(G.remain)) < 0.06 && Math.round(G.remain) <= 5) sfxTick();
+        if (G.remain <= 0) {
+          G.remain = 0;
+          updateTimerUI();
+          stopTimer();
+          if (!G.checking) {
+            onFail('시간 초과');
+          }
+          return;
+        }
+        updateTimerUI();
+      }, 100);
+    }
+    function stopTimer() { if (G.timer) { clearInterval(G.timer); G.timer = null; } }
+    function pauseTimer() { stopTimer(); }
+    function updateTimerUI() {
+      const wrap = $('#timerBarWrap');
+      if (!wrap) return;
+      const percent = (G.remain / G.time) * 100;
+      $('#timerBarFill').style.width = percent + '%';
+      wrap.classList.toggle('warn', G.remain <= 5.05);
+    }
+
+    /* =========================================================
+       렌더링
+    ========================================================= */
+    function renderChain() {
+      const c = $('#chain'); c.innerHTML = '';
+      G.chain.forEach((item, idx) => {
+        if (idx > 0) { const a = el('span', 'arrow'); a.textContent = '→'; c.appendChild(a); }
+        const t = el('div', 'wtile' + (item.type === 'seed' ? ' seed' : '') + ' pop'); t.textContent = item.word;
+        if (item.by != null) { const w = el('span', 'who'); w.textContent = G.players[item.by].name; w.style.background = G.players[item.by].color; t.appendChild(w); }
+        c.appendChild(t);
+      });
+      // 세로 스크롤로 하단까지 자동 스크롤 연동
+      c.parentElement.scrollTop = c.parentElement.scrollHeight;
+    }
+    function renderGrid() {
+      const grid = $('#pgrid'); grid.innerHTML = '';
+      const bottom = $('#gameBottom'); bottom.innerHTML = '';
+
+      for (let i = 0; i < G.players.length; i++) {
+        const p = G.players[i];
+        const active = (i === G.cur && !p.out);
+
+        // 1. 상단 플레이어 정보 카드
+        const cell = el('div', 'pcell');
+        if (active) cell.classList.add('active');
+        if (p.out) cell.classList.add('out');
+        cell.style.setProperty('--pcol', p.color);
+
+        const head = el('div', 'pcell-head');
+        const badge = el('span', 'pbadge'); badge.textContent = (i + 1); badge.style.background = p.color;
+        const nm = el('span', 'pcell-name'); nm.textContent = p.name;
+        const st = el('span', 'pcell-status');
+        if (p.out) { const o = el('span', 'outtag'); o.textContent = '아웃'; st.appendChild(o); }
+        else if (G.elim === 'heart') { const l = el('span', 'life'); l.textContent = '❤️'.repeat(p.hearts); st.appendChild(l); }
+        head.append(badge, nm, st); cell.appendChild(head);
+
+        const body = el('div', 'pcell-body');
+        const last = el('div', 'cellLast');
+        if (active) {
+          last.textContent = '입력 중...';
+          last.classList.add('typing-status');
+        } else {
+          if (p.lastWord) { last.textContent = p.lastWord; } else { last.textContent = '대기 중'; last.classList.add('muted'); }
+        }
+        body.appendChild(last);
+        cell.appendChild(body);
+        grid.appendChild(cell);
+
+        // 2. 하단 액션 카드 (활성 사용자 영역 정렬)
+        const bCell = el('div', 'pcell-bottom-action');
+        bCell.style.setProperty('--pcol', p.color);
+        if (active) {
+          bCell.classList.add('active');
+
+          const tag = el('div', 'turnTag'); tag.textContent = '내 차례!';
+
+          const reqBox = el('div', 'req-char-box');
+          const reqSyl = el('span', 'req-syl-inline'); reqSyl.textContent = G.reqChar;
+          const alts = deumVariants(G.reqChar).filter(c => c !== G.reqChar);
+          const reqAlt = el('span', 'req-alt-inline'); reqAlt.textContent = alts.length ? ' 또는 ' + alts.join('·') : '';
+          reqBox.append(reqSyl, reqAlt);
+
+          const pv = el('div', 'cellPreview'); pv.id = 'activePreview';
+          const fb = el('div', 'cellFeedback'); fb.id = 'activeFeedback';
+          bCell.append(tag, reqBox, pv, fb);
+
+          const kbdContainer = el('div', 'keypad-inline');
+          renderInlineKeypad(kbdContainer);
+          bCell.appendChild(kbdContainer);
+        }
+        bottom.appendChild(bCell);
       }
-    });
+      updatePreview();
+    }
 
-    // 8. 조작 격리 포인터 무설치 드래그 연출
-    function onPointerDown(e, side) {
-      if (!state.isGameRunning) return;
+    /* ---------- 키패드(플레이어별 인라인) ---------- */
+    const KEY_ROWS = [
+      ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'],
+      ['ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'],
+      ['SHIFT', 'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ', 'DEL']
+    ];
+    const SHIFT_MAP = { 'ㅂ': 'ㅃ', 'ㅈ': 'ㅉ', 'ㄷ': 'ㄸ', 'ㄱ': 'ㄲ', 'ㅅ': 'ㅆ', 'ㅐ': 'ㅒ', 'ㅔ': 'ㅖ' };
+    function renderInlineKeypad(container) {
+      container.innerHTML = '';
 
-      if (side === 'left' && state.leftFinished) return;
-      if (side === 'right' && state.rightFinished) return;
+      const pass = el('button', 'btn-pass-inline'); pass.innerHTML = '포기 ✋';
+      pass.onclick = (e) => { e.stopPropagation(); if (!G || G.checking) return; stopTimer(); onFail('포기'); };
+      container.appendChild(pass);
 
-      const beakerEl = e.target.closest('.beaker');
-      if (!beakerEl) return;
+      KEY_ROWS.forEach(row => {
+        const r = el('div', 'krow');
+        row.forEach(k => {
+          let b;
+          if (k === 'SHIFT') {
+            b = el('button', 'key util shift' + (G.kbShift ? ' on' : '')); b.textContent = '⇧';
+            b.onclick = (e) => { e.stopPropagation(); if (G.checking) return; G.kbShift = !G.kbShift; renderInlineKeypad(container); };
+          }
+          else if (k === 'DEL') {
+            b = el('button', 'key del'); b.textContent = '⌫';
+            b.onclick = (e) => { e.stopPropagation(); if (G.checking) return; G.composer.backspace(); updatePreview(); sfxKey(); };
+          }
+          else {
+            const out = (G.kbShift && SHIFT_MAP[k]) ? SHIFT_MAP[k] : k;
+            b = el('button', 'key'); b.textContent = out;
+            b.onclick = (e) => {
+              e.stopPropagation();
+              if (G.checking) return;
+              G.composer.input(out);
+              if (G.kbShift) { G.kbShift = false; renderInlineKeypad(container); }
+              updatePreview();
+              sfxKey();
+            };
+          }
+          r.appendChild(b);
+        });
+        container.appendChild(r);
+      });
 
-      const beakerIndex = parseInt(beakerEl.dataset.index, 10);
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-      const beaker = boardData.beakers[beakerIndex];
+      const er = el('div', 'krow');
+      const enter = el('button', 'key enter'); enter.textContent = '제출 ✓'; enter.onclick = (e) => { e.stopPropagation(); submitKeypad(); };
+      er.appendChild(enter);
+      container.appendChild(er);
+    }
 
-      if (beaker.length === 0) return;
-      if (boardData.completed.has(beakerIndex)) return;
+    function updatePreview() {
+      const prev = $('#activePreview'); if (!prev) return;
+      const t = G.composer.text;
+      prev.innerHTML = '';
 
-      for (let [pid, info] of state.activeDragPointers) {
-        if (info.boardSide === side && info.sourceBeakerIndex === beakerIndex) return;
+      // 입력이 아예 없는 극단적인 폴백(G.reqChar가 pre-fill되므로 실유저 사용 불가 영역)
+      if (!t) {
+        const activeSpan = el('span', 'active-char');
+        activeSpan.innerHTML = '&nbsp;';
+        prev.appendChild(activeSpan);
       }
+      else {
+        // 입력 텍스트가 있을 때:
+        // 만약 한 글자(기본 pre-fill된 제시 시작 글자만 있는 경우)면, 그 글자(completed)는 고정하고
+        // 다음 입력될 대기 위치(빈 &nbsp;) 밑에 반짝이는 커서선이 나옵니다.
+        if (t.length <= 1) {
+          const compSpan = el('span', 'completed-text');
+          compSpan.textContent = t;
+          prev.appendChild(compSpan);
 
-      e.preventDefault();
-      
-      cacheBeakerRegions(side);
+          const activeSpan = el('span', 'active-char');
+          activeSpan.innerHTML = '&nbsp;'; // 한 글자 넓이의 빈 공간
+          prev.appendChild(activeSpan);
+        } else {
+          // 두 글자 이상 입력 중일 때는 가장 마지막 작성 중인 "한 글자" 아래만 밑줄이 반짝입니다.
+          const completedText = t.slice(0, -1);
+          const activeText = t.slice(-1);
 
-      const topEmoji = beaker[beaker.length - 1];
-      const dragEmojis = [];
-      
-      while (beaker.length > 0 && beaker[beaker.length - 1] === topEmoji) {
-        dragEmojis.push(beaker.pop());
-      }
+          const compSpan = el('span', 'completed-text');
+          compSpan.textContent = completedText;
+          prev.appendChild(compSpan);
 
-      SoundManager.playPop();
-
-      const children = beakerEl.querySelectorAll('.emoji-slot');
-      const startIdx = beaker.length;
-      const popCount = dragEmojis.length;
-      for (let i = 0; i < popCount; i++) {
-        const idx = startIdx + i;
-        if (children[idx]) {
-          children[idx].classList.add('dragging-out');
+          const activeSpan = el('span', 'active-char');
+          activeSpan.textContent = activeText;
+          prev.appendChild(activeSpan);
         }
       }
+    }
+    function setFeedback(msg, type) { const f = $('#activeFeedback'); if (!f) return; f.textContent = msg; f.className = 'cellFeedback ' + (type || ''); }
 
-      const dragEl = document.createElement('div');
-      dragEl.className = 'drag-emoji';
-      
-      dragEmojis.forEach(emoji => {
-        const emojiNode = document.createElement('div');
-        emojiNode.className = 'drag-emoji-node';
-        emojiNode.textContent = emoji;
-        dragEl.appendChild(emojiNode);
+    async function submitKeypad() {
+      if (!G || G.checking) return;
+      const word = G.composer.text.trim();
+      if (!word) { setFeedback('글자를 입력해 주세요.', 'err'); sfxErr(); return; }
+      for (const ch of word) { if (ch < '가' || ch > '힣') { setFeedback('완성되지 않은 글자가 있어요.', 'err'); sfxErr(); return; } }
+
+      // 1. 이전 단어의 마지막 한 글자로부터 두음법칙 변이 집합을 가져옵니다.
+      const lastWord = G.chain[G.chain.length - 1].word;
+      const lastChar = lastWord[lastWord.length - 1];
+      const firstCharVariants = deumVariants(lastChar);
+      const suffix = word.substring(1);
+
+      // 2. 두음법칙 후보 단어들을 만듭니다. (사용자가 입력한 단어 word를 최우선 순위로 설정)
+      const candidatesSet = new Set();
+      candidatesSet.add(word);
+      firstCharVariants.forEach(v => {
+        candidatesSet.add(v + suffix);
+      });
+      const candidates = [...candidatesSet];
+
+      // 3. 로컬 체크 (글자수 2~5자, 이미 사용 여부) 필터링
+      const validCandidates = candidates.filter(cand => {
+        if (cand.length < 2 || cand.length > 5) return false;
+        if (G.used.has(cand)) return false;
+        return true;
       });
 
-      if (DOM.dragContainer) DOM.dragContainer.appendChild(dragEl);
+      if (validCandidates.length === 0) {
+        const anyUsed = candidates.some(cand => G.used.has(cand));
+        if (anyUsed) {
+          setFeedback('이미 나온 단어예요.', 'err');
+        } else {
+          setFeedback('글자 수가 맞지 않거나 잘못된 입력이에요.', 'err');
+        }
+        sfxErr();
+        return;
+      }
 
-      const startX = e.clientX;
-      const startY = e.clientY;
-      dragEl.style.transform = `translate3d(${startX}px, ${startY}px, 0) translate(-50%, -50%) scale(1.1)`;
+      G.checking = true; setFeedback('우리말샘에서 확인 중… ⏳', 'checking');
 
-      state.activeDragPointers.set(e.pointerId, {
-        boardSide: side,
-        sourceBeakerIndex: beakerIndex,
-        emojis: dragEmojis,
-        dragElement: dragEl,
-        currentX: startX,
-        currentY: startY,
-        beakerElement: beakerEl,
-        hoveredIndex: -1
-      });
-    }
-
-    function onPointerMove(e) {
-      const dragInfo = state.activeDragPointers.get(e.pointerId);
-      if (!dragInfo) return;
-
-      dragInfo.currentX = e.clientX;
-      dragInfo.currentY = e.clientY;
-    }
-
-    function onPointerUp(e) {
-      const dragInfo = state.activeDragPointers.get(e.pointerId);
-      if (!dragInfo) return;
-
-      const side = dragInfo.boardSide;
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-
-      const dropX = dragInfo.currentX;
-      const dropY = dragInfo.currentY;
-      let targetIndex = -1;
-      let targetBeakerEl = null;
-
-      for (let region of boardData.regions) {
-        if (dropX >= region.left && dropX <= region.right && dropY >= region.top && dropY <= region.bottom) {
-          targetIndex = region.index;
-          targetBeakerEl = region.element;
+      // 4. 내장 사전에 후보 단어가 있는지 우선 확인
+      let winner = null;
+      let source = 'offline';
+      for (const cand of validCandidates) {
+        if (DICT.has(cand)) {
+          winner = cand;
           break;
         }
       }
 
-      if (!targetBeakerEl) {
-        const fallbackTarget = document.elementFromPoint(dropX, dropY);
-        const beakerCandidate = fallbackTarget ? fallbackTarget.closest('.beaker') : null;
-        if (beakerCandidate) {
-          const boardBoard = beakerCandidate.closest('.beaker-board');
-          const candidateSide = boardBoard ? boardBoard.dataset.side : null;
-          if (candidateSide === side) {
-            targetIndex = parseInt(beakerCandidate.dataset.index, 10);
-            targetBeakerEl = beakerCandidate;
-          }
-        }
-      }
-
-      const sideSelector = side === 'left' ? '.left-side' : '.right-side';
-      document.querySelectorAll(`${sideSelector} .beaker.hovered`).forEach(el => el.classList.remove('hovered'));
-
-      let moveSuccess = false;
-
-      if (targetBeakerEl && targetIndex !== dragInfo.sourceBeakerIndex) {
-        if (isValidMove(side, dragInfo.sourceBeakerIndex, targetIndex, dragInfo.emojis)) {
-          moveSuccess = true;
-        }
-      }
-
-      if (moveSuccess) {
-        const targetBeaker = boardData.beakers[targetIndex];
-        dragInfo.emojis.forEach(emoji => targetBeaker.push(emoji));
-
-        SoundManager.playDrop();
-
-        checkCompletedBeakers(side);
-        renderBeakers(side);
-        updateProgressUI(side);
-        checkWinCondition(side);
-
-        const rect = targetBeakerEl.getBoundingClientRect();
-        const destX = rect.left + rect.width / 2;
-        const destY = rect.top + rect.height / 2;
-
-        animateDragElementTo(dragInfo.dragElement, destX, destY, () => {
-          dragInfo.dragElement.remove();
-        });
-      } else {
-        SoundManager.playFail();
-
-        const sourceBeaker = boardData.beakers[dragInfo.sourceBeakerIndex];
-        dragInfo.emojis.forEach(emoji => sourceBeaker.push(emoji));
-
-        renderBeakers(side);
-
-        const rect = dragInfo.beakerElement.getBoundingClientRect();
-        const destX = rect.left + rect.width / 2;
-        const destY = rect.top + rect.height / 2;
-
-        animateDragElementTo(dragInfo.dragElement, destX, destY, () => {
-          dragInfo.dragElement.remove();
-        });
-      }
-
-      state.activeDragPointers.delete(e.pointerId);
-    }
-
-    function onPointerCancel(e) {
-      const dragInfo = state.activeDragPointers.get(e.pointerId);
-      if (!dragInfo) return;
-
-      const side = dragInfo.boardSide;
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-
-      const sourceBeaker = boardData.beakers[dragInfo.sourceBeakerIndex];
-      dragInfo.emojis.forEach(emoji => sourceBeaker.push(emoji));
-      dragInfo.dragElement.remove();
-      
-      renderBeakers(side);
-      state.activeDragPointers.delete(e.pointerId);
-    }
-
-    function startRenderLoop() {
-      stopRenderLoop();
-      
-      const tick = () => {
-        if (!state.isGameRunning) return;
-        
-        for (let [pid, dragInfo] of state.activeDragPointers) {
-          const el = dragInfo.dragElement;
-          const x = dragInfo.currentX;
-          const y = dragInfo.currentY;
-          const side = dragInfo.boardSide;
-          const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-          
-          el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(1.1)`;
-          
-          let currentHoverIndex = -1;
-          for (let region of boardData.regions) {
-            if (x >= region.left && x <= region.right && y >= region.top && y <= region.bottom) {
-              currentHoverIndex = region.index;
-              break;
-            }
-          }
-          
-          if (currentHoverIndex !== dragInfo.hoveredIndex) {
-            if (dragInfo.hoveredIndex !== -1) {
-              const prevRegion = boardData.regions.find(r => r.index === dragInfo.hoveredIndex);
-              if (prevRegion) prevRegion.element.classList.remove('hovered');
-            }
-            
-            if (currentHoverIndex !== -1 && currentHoverIndex !== dragInfo.sourceBeakerIndex && !boardData.completed.has(currentHoverIndex)) {
-              const curRegion = boardData.regions.find(r => r.index === currentHoverIndex);
-              if (curRegion) curRegion.element.classList.add('hovered');
-              dragInfo.hoveredIndex = currentHoverIndex;
+      // 5. 내장 사전에 없는 경우 온라인 우리말샘으로 병렬 조회 진행
+      if (!winner) {
+        source = 'online';
+        try {
+          const results = await Promise.all(validCandidates.map(async cand => {
+            const r = await checkWord(cand);
+            return { cand, r };
+          }));
+          const successObj = results.find(item => item.r.ok);
+          if (successObj) {
+            winner = successObj.cand;
+          } else {
+            const originalResult = results.find(item => item.cand === word) || results[0];
+            setFeedback(originalResult.r.reason || '사전에 없는 단어예요.', 'err');
+            sfxErr();
+            G.checking = false;
+            if (G.remain <= 0) {
+              onFail('시간 초과');
             } else {
-              dragInfo.hoveredIndex = -1;
+              startTimer(false);
             }
+            return;
           }
-        }
-        
-        state.animFrameId = requestAnimationFrame(tick);
-      };
-      
-      state.animFrameId = requestAnimationFrame(tick);
-    }
-
-    function stopRenderLoop() {
-      if (state.animFrameId) {
-        cancelAnimationFrame(state.animFrameId);
-        state.animFrameId = null;
-      }
-    }
-
-    function animateDragElementTo(el, destX, destY, callback) {
-      el.style.transition = 'transform 0.22s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.22s ease';
-      el.style.transform = `translate3d(${destX}px, ${destY}px, 0) translate(-50%, -50%) scale(0.5)`;
-      el.style.opacity = '0.2';
-      
-      setTimeout(callback, 220);
-    }
-
-    // 9. 워터소트 배틀킹 룰 및 완료 검사
-    function isValidMove(side, srcIdx, destIdx, emojiList) {
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-      
-      if (boardData.completed.has(destIdx)) return false;
-
-      const dest = boardData.beakers[destIdx];
-      const capacity = state.beakerCapacity;
-      
-      const moveCount = emojiList.length;
-      const currentDestCount = dest.length;
-
-      if (currentDestCount + moveCount > capacity) {
-        return false;
-      }
-
-      if (currentDestCount === 0) {
-        return true;
-      }
-
-      const destTopEmoji = dest[currentDestCount - 1];
-      const dragEmojiType = emojiList[0];
-
-      return destTopEmoji === dragEmojiType;
-    }
-
-    function checkCompletedBeakers(side) {
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-      boardData.completed.clear();
-      
-      boardData.beakers.forEach((beaker, index) => {
-        if (beaker.length === state.beakerCapacity) {
-          const firstEmoji = beaker[0];
-          const isAllSame = beaker.every(emoji => emoji === firstEmoji);
-          if (isAllSame) {
-            boardData.completed.add(index);
+        } catch (e) {
+          setFeedback('사전 조회 중 오류가 발생했어요.', 'err');
+          sfxErr();
+          G.checking = false;
+          if (G.remain <= 0) {
+            onFail('시간 초과');
+          } else {
+            startTimer(false);
           }
+          return;
         }
+      }
+
+      if (!G) return;
+      if (source === 'offline' && !G.warnedOffline) { G.warnedOffline = true; flash('우리말샘 연결이 막혀 내장 사전으로 판정해요'); }
+
+      G.checking = false; stopTimer();
+      G.used.add(winner);
+      G.players[G.cur].lastWord = winner;
+      G.chain.push({ word: winner, by: G.cur });
+      G.reqChar = applyDeum(winner[winner.length - 1]);
+      renderChain();
+
+      setFeedback(source === 'offline' ? '정답! (오프라인 사전) 🎉' : '정답! 🎉', 'ok'); sfxOk();
+
+      // 성공 전광판 연출 후 다음 턴으로
+      showWordOverlay('success', winner, G.players[G.cur].color, () => {
+        G.turns++;
+        advance();
       });
     }
 
-    function updateProgressUI(side) {
-      const completedEl = side === 'left' ? DOM.leftCompleted : DOM.rightCompleted;
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-      if (completedEl) completedEl.textContent = boardData.completed.size;
+    /* =========================================================
+       진행/판정
+    ========================================================= */
+    function advance() {
+      const alive = aliveIdx();
+      if (alive.length <= 1) { endGame(); return; }
+      G.cur = nextAlive(G.cur);
+      setTimeout(startTurn, 150);
     }
-
-    // 10. 타이머 엔진
-    function startTimer() {
+    function onFail(reason) {
+      if (!G || G.checking) return;
       stopTimer();
-      state.elapsedMs = 0;
-      state.startTime = performance.now();
-      state.isGameRunning = true;
-      
-      const hasTimeLimit = state.timeLimit !== 'infinite';
-      const limitMs = hasTimeLimit ? parseInt(state.timeLimit, 10) * 1000 : 0;
-      
-      if (DOM.timerLabel) {
-        DOM.timerLabel.textContent = hasTimeLimit ? '⏱️ 남은 시간' : '⏱️ 진행 시간';
-      }
+      const p = G.players[G.cur]; sfxErr();
+      if (G.elim === 'out') p.out = true;
+      else { p.hearts = Math.max(0, p.hearts - 1); if (p.hearts <= 0) p.out = true; }
+      renderGrid();
+      flash(reason + (p.out ? ' · ' + p.name + ' 아웃!' : ' · ' + p.name + ' 하트 -1'));
 
-      state.timerInterval = setInterval(() => {
-        const now = performance.now();
-        if (hasTimeLimit) {
-          const remainingMs = limitMs - (now - state.startTime);
-          state.elapsedMs = limitMs - remainingMs;
-          
-          if (remainingMs <= 0) {
-            DOM.timer.textContent = '00:00.00';
-            handleTimeOver();
-          } else {
-            DOM.timer.textContent = formatTime(remainingMs);
-          }
-        } else {
-          state.elapsedMs = now - state.startTime;
-          DOM.timer.textContent = formatTime(state.elapsedMs);
-        }
-      }, 33);
+      const alive = aliveIdx();
+      if (alive.length <= 1) { setTimeout(endGame, 800); return; }
+
+      const seed = EASY_SEEDS[(Math.random() * EASY_SEEDS.length) | 0];
+      G.chain.push({ type: 'seed', word: seed });
+      G.reqChar = applyDeum(seed[seed.length - 1]);
+      G.used.add(seed);
+      renderChain();
+
+      // 새 제시어 전광판 연출 후 다음 플레이어로 시작
+      showWordOverlay('seed', seed, null, () => {
+        G.cur = nextAlive(G.cur);
+        startTurn();
+      });
+    }
+    function flash(msg) {
+      const t = el('div', 'toast'); t.textContent = msg;
+      const g = $('#game'); g.appendChild(t);
+      setTimeout(() => t.remove(), 1300);
     }
 
-    function stopTimer() {
-      if (state.timerInterval) {
-        clearInterval(state.timerInterval);
-        state.timerInterval = null;
-      }
-    }
-
-    function formatTime(ms) {
-      if (ms < 0) ms = 0;
-      let minutes = Math.floor(ms / 60000);
-      let seconds = Math.floor((ms % 60000) / 1000);
-      let centiseconds = Math.floor((ms % 1000) / 10);
-      
-      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
-    }
-
-    // 11. 승패 판정 및 대기 규칙 적용
-    function checkWinCondition(side) {
-      const boardData = side === 'left' ? state.leftBoard : state.rightBoard;
-      const filledCount = state.totalBeakersCount - state.emptyBeakersCount;
-      const isWon = boardData.completed.size === filledCount;
-      
-      if (isWon) {
-        if (side === 'left' && !state.leftFinished) {
-          state.leftFinished = true;
-          state.leftClearTime = state.elapsedMs;
-          SoundManager.playComplete();
-          DOM.leftTeamSide.classList.add('finished-wait');
-          DOM.leftTeamTitle.textContent = "🔵 BLUE TEAM (완료! 대기중)";
-        } else if (side === 'right' && !state.rightFinished) {
-          state.rightFinished = true;
-          state.rightClearTime = state.elapsedMs;
-          SoundManager.playComplete();
-          DOM.rightTeamSide.classList.add('finished-wait');
-          DOM.rightTeamTitle.textContent = "🔴 RED TEAM (완료! 대기중)";
-        }
-
-        const isTimeMode = state.timeLimit !== 'infinite';
-
-        if (isTimeMode) {
-          if (state.leftFinished && state.rightFinished) {
-            stopTimer();
-            stopRenderLoop();
-            state.isGameRunning = false;
-            SoundManager.playWin();
-            setTimeout(() => showBattleResult(), 600);
-          }
-        } else {
-          if (state.leftFinished && state.rightFinished) {
-            stopTimer();
-            stopRenderLoop();
-            state.isGameRunning = false;
-            SoundManager.playWin();
-            setTimeout(() => showBattleResult(), 600);
-          }
-        }
-      }
-    }
-
-    function handleTimeOver() {
+    /* =========================================================
+       결과
+    ========================================================= */
+    function endGame() {
       stopTimer();
-      stopRenderLoop();
-      state.isGameRunning = false;
-      state.activeDragPointers.clear();
-      
-      SoundManager.playWin();
-      setTimeout(() => showBattleResult(true), 600);
+      const winner = aliveIdx().length ? G.players[aliveIdx()[0]] : G.players[G.cur];
+      $('#game').classList.add('hidden');
+      $('#result').classList.remove('hidden');
+      const wn = $('#winName'); wn.textContent = winner.name; wn.style.color = '#fff'; wn.style.textShadow = '0 4px 0 ' + winner.color;
+      const wordCount = G.chain.length;
+      $('#resultStats').innerHTML =
+        '<span>이어진 단어 <b>' + wordCount + '</b>개</span>' +
+        '<span>총 턴 <b>' + G.turns + '</b></span>' +
+        '<span>참가 <b>' + G.players.length + '</b>명</span>';
+      sfxWin(); confetti();
     }
-
-    function showBattleResult(isTimeOver = false) {
-      if (!DOM.winTeamTitle) return;
-
-      const leftBeakersCompleted = state.leftBoard.completed.size;
-      const rightBeakersCompleted = state.rightBoard.completed.size;
-      
-      let winner = 'draw';
-      let summaryText = "";
-
-      if (state.leftFinished && state.rightFinished) {
-        if (state.leftClearTime < state.rightClearTime) {
-          winner = 'left';
-          summaryText = `두 팀 모두 완성! 블루 팀이 더 빠름! (${formatTime(state.leftClearTime)} vs ${formatTime(state.rightClearTime)})`;
-        } else if (state.leftClearTime > state.rightClearTime) {
-          winner = 'right';
-          summaryText = `두 팀 모두 완성! 레드 팀이 더 빠름! (${formatTime(state.leftClearTime)} vs ${formatTime(state.rightClearTime)})`;
-        } else {
-          winner = 'draw';
-          summaryText = `두 팀 모두 완벽하게 동시에 완성! (${formatTime(state.leftClearTime)})`;
-        }
-      } 
-      else if (state.leftFinished && !state.rightFinished) {
-        winner = 'left';
-        summaryText = `블루 팀 단독 완성 성공! (${formatTime(state.leftClearTime)}) (레드 팀 ${rightBeakersCompleted}개 완료)`;
-      } 
-      else if (!state.leftFinished && state.rightFinished) {
-        winner = 'right';
-        summaryText = `레드 팀 단독 완성 성공! (${formatTime(state.rightClearTime)}) (블루 팀 ${leftBeakersCompleted}개 완료)`;
-      } 
-      else {
-        if (leftBeakersCompleted > rightBeakersCompleted) {
-          winner = 'left';
-          summaryText = `시간 초과! 블루 팀이 더 많이 완성함! (블루 ${leftBeakersCompleted}개 vs 레드 ${rightBeakersCompleted}개)`;
-        } else if (leftBeakersCompleted < rightBeakersCompleted) {
-          winner = 'right';
-          summaryText = `시간 초과! 레드 팀이 더 많이 완성함! (블루 ${leftBeakersCompleted}개 vs 레드 ${rightBeakersCompleted}개)`;
-        } else {
-          winner = 'draw';
-          summaryText = `시간 초과! 동점 기록으로 무승부! (각 ${leftBeakersCompleted}개 완성)`;
-        }
+    function confetti() {
+      const em = ['🎉', '👑', '⭐', '🎊', '✨', '🏆'];
+      for (let i = 0; i < 40; i++) {
+        const s = el('div', 'emoji-fall'); s.textContent = em[(Math.random() * em.length) | 0];
+        s.style.left = (Math.random() * 100) + 'vw';
+        s.style.animationDuration = (2.4 + Math.random() * 2.2) + 's';
+        s.style.animationDelay = (Math.random() * 0.8) + 's';
+        s.style.fontSize = (22 + Math.random() * 26) + 'px';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 5200);
       }
+    }
+    $('#againSame').onclick = () => { startGame(); };
+    $('#againNew').onclick = () => { $('#result').classList.add('hidden'); $('#setup').classList.remove('hidden'); buildSetup(); };
 
-      if (winner === 'left') {
-        DOM.winTeamTitle.textContent = '🔵 BLUE TEAM 승리!';
-        DOM.winTeamTitle.style.color = 'var(--blue-team)';
-      } else if (winner === 'right') {
-        DOM.winTeamTitle.textContent = '🔴 RED TEAM 승리!';
-        DOM.winTeamTitle.style.color = 'var(--red-team)';
+    /* 홈 및 전체화면 핸들러 */
+    $('#homeBtn').onclick = () => { if (confirm('게임을 종료하고 홈(설정)으로 돌아갈까요?')) { stopTimer(); $('#game').classList.add('hidden'); $('#setup').classList.remove('hidden'); buildSetup(); } };
+    $('#fullscreenBtn').onclick = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert("전체화면을 실행할 수 없습니다: " + err.message);
+        });
       } else {
-        DOM.winTeamTitle.textContent = '🤝 무승부!';
-        DOM.winTeamTitle.style.color = 'var(--text-main)';
+        document.exitFullscreen();
       }
-      
-      if (DOM.winTimeDesc) {
-        DOM.winTimeDesc.innerHTML = summaryText;
+    };
+    document.addEventListener('fullscreenchange', () => {
+      const btn = $('#fullscreenBtn');
+      if (!btn) return;
+      if (document.fullscreenElement) {
+        btn.textContent = '✖️';
+        btn.title = '전체화면 해제';
+      } else {
+        btn.textContent = '🖥️';
+        btn.title = '전체화면';
       }
-      
-      if (DOM.finalTime) {
-        DOM.finalTime.textContent = formatTime(state.elapsedMs);
-      }
-      
-      if (DOM.winModal) DOM.winModal.classList.add('active');
-    }
+    });
 
-    function closeWinModal() {
-      if (DOM.winModal) DOM.winModal.classList.remove('active');
-    }
-  </script>
 
-  <!-- ============================================================
-       [다국어(i18n) 엔진 - 게임 로직과 완전히 독립된 별도 스크립트]
-       · 게임 코드는 일절 수정하지 않고, DOM 텍스트만 갱신
-       · 우선순위: URL(?lang=) > localStorage('kingsmath_lang') > navigator.language > 기본 en
-       ============================================================ -->
-  <script>
-  (function () {
-    // 16개국 언어 데이터 (국기/표시명)
-    var languages = [
-      { code: 'ko',    country: 'kr', name: '한국어',            enName: 'Korean' },
-      { code: 'en',    country: 'us', name: 'English',           enName: 'English' },
-      { code: 'zh',    country: 'cn', name: '中文 (简体)',        enName: 'Chinese (Simplified)' },
-      { code: 'ja',    country: 'jp', name: '日本語',            enName: 'Japanese' },
-      { code: 'es',    country: 'es', name: 'Español',           enName: 'Spanish' },
-      { code: 'fr',    country: 'fr', name: 'Français',          enName: 'French' },
-      { code: 'de',    country: 'de', name: 'Deutsch',           enName: 'German' },
-      { code: 'it',    country: 'it', name: 'Italiano',          enName: 'Italian' },
-      { code: 'pt-br', country: 'br', name: 'Português (BR)',    enName: 'Portuguese (Brazil)' },
-      { code: 'ru',    country: 'ru', name: 'Русский',           enName: 'Russian' },
-      { code: 'hi',    country: 'in', name: 'हिन्दी',             enName: 'Hindi' },
-      { code: 'bn',    country: 'bd', name: 'বাংলা',             enName: 'Bengali' },
-      { code: 'id',    country: 'id', name: 'Bahasa Indonesia',  enName: 'Indonesian' },
-      { code: 'vi',    country: 'vn', name: 'Tiếng Việt',        enName: 'Vietnamese' },
-      { code: 'th',    country: 'th', name: 'ไทย',               enName: 'Thai' },
-      { code: 'tr',    country: 'tr', name: 'Türkçe',            enName: 'Turkish' }
-    ];
-
-    // 각 나라 초등 수학 눈높이의 쉬운 어휘로 번역 (범용 처리 아님, 언어별 개별 번역)
-    var T = {
-      ko: { title:"이모지 소트 배틀킹", subtitle:"소트 퍼즐 한계에 도전하라!",
-        diff_label:"난이도 프리셋", diff_easy:"🟢 쉬움", diff_normal:"🟡 보통", diff_hard:"🔴 어려움", diff_veryhard:"🔥 완전 어려움", diff_insane:"💀 핵 어려움", diff_impossible:"👾 불가능",
-        detail_label:"상세 설정 조절", ctrl_total:"🧪 총 비커 수", ctrl_empty:"🥛 빈 비커 수", ctrl_emoji:"🎨 이모지 종류 수",
-        time_label:"시간 제한", time_1:"⏱️ 1분", time_2:"⏱️ 2분", time_3:"⏱️ 3분", time_4:"⏱️ 4분", time_5:"⏱️ 5분", time_inf:"♾️ 무제한",
-        theme_label:"이모지 테마", theme_mixed:"🎨 혼합", theme_animals:"🦁 동물원", theme_fruits:"🍎 과일", theme_foods:"🍔 음식", theme_activities:"⚽ 스포츠",
-        start_btn:"배틀킹 시작하기 ⚔️", other_game:"다른 게임 고르기",
-        cd_ready:"⚔️ 이모지소트를 시작합니다 ⚔️", cd_go:"준비하세요!",
-        back_btn:"🏠 설정 변경", timer_run:"⏱️ 진행 시간", fullscreen:"🖥️ 전체화면",
-        blue_team:"🔵 BLUE TEAM", red_team:"🔴 RED TEAM", completed:"완료:", reset_left:"🔵 다시 시작", reset_right:"🔴 다시 시작",
-        modal_replay:"한 판 더 ⚔️", modal_setup:"설정 변경",
-        search_ph:"검색 ...", no_result:"검색 결과 없음", toast:"언어가 변경되었습니다.",
-        seo_title:"이모지 소트 배틀킹 - 물 붓기 정렬 퍼즐 대전", seo_desc:"이모지를 정렬해 비커를 완성하는 2인 대전 퍼즐! 블루팀 vs 레드팀 실시간 배틀.", seo_keywords:"이모지 소트, 물 정렬 퍼즐, 배틀킹, 킹수학, 정렬 게임" },
-
-      en: { title:"Emoji Sort Battle King", subtitle:"Take on the ultimate sorting puzzle!",
-        diff_label:"Difficulty", diff_easy:"🟢 Easy", diff_normal:"🟡 Normal", diff_hard:"🔴 Hard", diff_veryhard:"🔥 Very Hard", diff_insane:"💀 Insane", diff_impossible:"👾 Impossible",
-        detail_label:"Detailed Settings", ctrl_total:"🧪 Total Tubes", ctrl_empty:"🥛 Empty Tubes", ctrl_emoji:"🎨 Emoji Types",
-        time_label:"Time Limit", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ No Limit",
-        theme_label:"Emoji Theme", theme_mixed:"🎨 Mixed", theme_animals:"🦁 Animals", theme_fruits:"🍎 Fruits", theme_foods:"🍔 Foods", theme_activities:"⚽ Sports",
-        start_btn:"Start Battle ⚔️", other_game:"Other Games",
-        cd_ready:"⚔️ Get Ready to Battle ⚔️", cd_go:"Get ready!",
-        back_btn:"🏠 Settings", timer_run:"⏱️ Time", fullscreen:"🖥️ Fullscreen",
-        blue_team:"🔵 BLUE TEAM", red_team:"🔴 RED TEAM", completed:"Done:", reset_left:"🔵 Restart", reset_right:"🔴 Restart",
-        modal_replay:"Play Again ⚔️", modal_setup:"Settings",
-        search_ph:"Search ...", no_result:"No results", toast:"Language changed.",
-        seo_title:"Emoji Sort Battle King - Water Sort Puzzle Duel", seo_desc:"Sort emojis to fill the tubes in this 2-player puzzle duel! Blue Team vs Red Team in real time.", seo_keywords:"emoji sort, water sort puzzle, sort game, battle king, brain puzzle" },
-
-      zh: { title:"表情分类对战王", subtitle:"挑战分类益智的极限！",
-        diff_label:"难度", diff_easy:"🟢 简单", diff_normal:"🟡 普通", diff_hard:"🔴 困难", diff_veryhard:"🔥 超难", diff_insane:"💀 疯狂", diff_impossible:"👾 不可能",
-        detail_label:"详细设置", ctrl_total:"🧪 试管总数", ctrl_empty:"🥛 空试管数", ctrl_emoji:"🎨 表情种类",
-        time_label:"时间限制", time_1:"⏱️ 1分钟", time_2:"⏱️ 2分钟", time_3:"⏱️ 3分钟", time_4:"⏱️ 4分钟", time_5:"⏱️ 5分钟", time_inf:"♾️ 无限制",
-        theme_label:"表情主题", theme_mixed:"🎨 混合", theme_animals:"🦁 动物", theme_fruits:"🍎 水果", theme_foods:"🍔 食物", theme_activities:"⚽ 运动",
-        start_btn:"开始对战 ⚔️", other_game:"其他游戏",
-        cd_ready:"⚔️ 准备对战 ⚔️", cd_go:"准备好！",
-        back_btn:"🏠 设置", timer_run:"⏱️ 时间", fullscreen:"🖥️ 全屏",
-        blue_team:"🔵 蓝队", red_team:"🔴 红队", completed:"完成：", reset_left:"🔵 重新开始", reset_right:"🔴 重新开始",
-        modal_replay:"再玩一局 ⚔️", modal_setup:"设置",
-        search_ph:"搜索 ...", no_result:"没有结果", toast:"语言已更改。",
-        seo_title:"表情分类对战王 - 倒水分类益智对战", seo_desc:"整理表情填满试管的双人益智对战！蓝队对红队实时较量。", seo_keywords:"表情分类, 倒水排序, 分类游戏, 益智对战" },
-
-      ja: { title:"絵文字ソート バトルキング", subtitle:"ソートパズルの限界に挑戦！",
-        diff_label:"難易度", diff_easy:"🟢 かんたん", diff_normal:"🟡 ふつう", diff_hard:"🔴 むずかしい", diff_veryhard:"🔥 超むずかしい", diff_insane:"💀 激ムズ", diff_impossible:"👾 不可能",
-        detail_label:"詳細設定", ctrl_total:"🧪 試験管の数", ctrl_empty:"🥛 空の試験管", ctrl_emoji:"🎨 絵文字の種類",
-        time_label:"制限時間", time_1:"⏱️ 1分", time_2:"⏱️ 2分", time_3:"⏱️ 3分", time_4:"⏱️ 4分", time_5:"⏱️ 5分", time_inf:"♾️ 無制限",
-        theme_label:"絵文字テーマ", theme_mixed:"🎨 ミックス", theme_animals:"🦁 どうぶつ", theme_fruits:"🍎 くだもの", theme_foods:"🍔 たべもの", theme_activities:"⚽ スポーツ",
-        start_btn:"バトル開始 ⚔️", other_game:"ほかのゲーム",
-        cd_ready:"⚔️ バトルの準備中 ⚔️", cd_go:"準備して！",
-        back_btn:"🏠 設定", timer_run:"⏱️ タイム", fullscreen:"🖥️ 全画面",
-        blue_team:"🔵 ブルーチーム", red_team:"🔴 レッドチーム", completed:"完了:", reset_left:"🔵 やり直す", reset_right:"🔴 やり直す",
-        modal_replay:"もう一回 ⚔️", modal_setup:"設定",
-        search_ph:"検索 ...", no_result:"結果がありません", toast:"言語が変更されました。",
-        seo_title:"絵文字ソート バトルキング - 水ソートパズル対戦", seo_desc:"絵文字を並べて試験管を完成させる2人対戦パズル！ブルー対レッドのリアルタイムバトル。", seo_keywords:"絵文字ソート, 水ソートパズル, 並べ替えゲーム, 対戦パズル" },
-
-      es: { title:"Rey de Clasificación Emoji", subtitle:"¡Supera el reto del rompecabezas!",
-        diff_label:"Dificultad", diff_easy:"🟢 Fácil", diff_normal:"🟡 Normal", diff_hard:"🔴 Difícil", diff_veryhard:"🔥 Muy Difícil", diff_insane:"💀 Extremo", diff_impossible:"👾 Imposible",
-        detail_label:"Ajustes", ctrl_total:"🧪 Tubos Totales", ctrl_empty:"🥛 Tubos Vacíos", ctrl_emoji:"🎨 Tipos de Emoji",
-        time_label:"Tiempo Límite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Sin Límite",
-        theme_label:"Tema de Emoji", theme_mixed:"🎨 Mixto", theme_animals:"🦁 Animales", theme_fruits:"🍎 Frutas", theme_foods:"🍔 Comidas", theme_activities:"⚽ Deportes",
-        start_btn:"Comenzar ⚔️", other_game:"Otros Juegos",
-        cd_ready:"⚔️ Prepárate para la batalla ⚔️", cd_go:"¡Prepárate!",
-        back_btn:"🏠 Ajustes", timer_run:"⏱️ Tiempo", fullscreen:"🖥️ Pantalla Completa",
-        blue_team:"🔵 EQUIPO AZUL", red_team:"🔴 EQUIPO ROJO", completed:"Hecho:", reset_left:"🔵 Reiniciar", reset_right:"🔴 Reiniciar",
-        modal_replay:"Jugar Otra Vez ⚔️", modal_setup:"Ajustes",
-        search_ph:"Buscar ...", no_result:"Sin resultados", toast:"Idioma cambiado.",
-        seo_title:"Rey de Clasificación Emoji - Puzzle de Ordenar Agua", seo_desc:"¡Ordena emojis para llenar los tubos en este duelo de 2 jugadores! Equipo Azul contra Rojo en tiempo real.", seo_keywords:"clasificar emoji, puzzle de agua, juego de ordenar, rompecabezas" },
-
-      fr: { title:"Roi du Tri des Emojis", subtitle:"Relève le défi du casse-tête de tri !",
-        diff_label:"Difficulté", diff_easy:"🟢 Facile", diff_normal:"🟡 Normal", diff_hard:"🔴 Difficile", diff_veryhard:"🔥 Très Difficile", diff_insane:"💀 Extrême", diff_impossible:"👾 Impossible",
-        detail_label:"Réglages", ctrl_total:"🧪 Tubes Totaux", ctrl_empty:"🥛 Tubes Vides", ctrl_emoji:"🎨 Types d’Emoji",
-        time_label:"Temps Limite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Illimité",
-        theme_label:"Thème Emoji", theme_mixed:"🎨 Mixte", theme_animals:"🦁 Animaux", theme_fruits:"🍎 Fruits", theme_foods:"🍔 Nourriture", theme_activities:"⚽ Sports",
-        start_btn:"Commencer ⚔️", other_game:"Autres Jeux",
-        cd_ready:"⚔️ Prépare-toi au combat ⚔️", cd_go:"Prêt !",
-        back_btn:"🏠 Réglages", timer_run:"⏱️ Temps", fullscreen:"🖥️ Plein Écran",
-        blue_team:"🔵 ÉQUIPE BLEUE", red_team:"🔴 ÉQUIPE ROUGE", completed:"Fini :", reset_left:"🔵 Recommencer", reset_right:"🔴 Recommencer",
-        modal_replay:"Rejouer ⚔️", modal_setup:"Réglages",
-        search_ph:"Rechercher ...", no_result:"Aucun résultat", toast:"Langue modifiée.",
-        seo_title:"Roi du Tri des Emojis - Puzzle de Tri d’Eau", seo_desc:"Trie les emojis pour remplir les tubes dans ce duel à 2 joueurs ! Équipe Bleue contre Rouge en temps réel.", seo_keywords:"tri emoji, puzzle de tri d’eau, jeu de tri, casse-tête" },
-
-      de: { title:"Emoji-Sortier-König", subtitle:"Meistere das Sortier-Rätsel!",
-        diff_label:"Schwierigkeit", diff_easy:"🟢 Leicht", diff_normal:"🟡 Normal", diff_hard:"🔴 Schwer", diff_veryhard:"🔥 Sehr Schwer", diff_insane:"💀 Extrem", diff_impossible:"👾 Unmöglich",
-        detail_label:"Einstellungen", ctrl_total:"🧪 Röhren Gesamt", ctrl_empty:"🥛 Leere Röhren", ctrl_emoji:"🎨 Emoji-Arten",
-        time_label:"Zeitlimit", time_1:"⏱️ 1 Min", time_2:"⏱️ 2 Min", time_3:"⏱️ 3 Min", time_4:"⏱️ 4 Min", time_5:"⏱️ 5 Min", time_inf:"♾️ Kein Limit",
-        theme_label:"Emoji-Thema", theme_mixed:"🎨 Gemischt", theme_animals:"🦁 Tiere", theme_fruits:"🍎 Früchte", theme_foods:"🍔 Essen", theme_activities:"⚽ Sport",
-        start_btn:"Kampf Starten ⚔️", other_game:"Andere Spiele",
-        cd_ready:"⚔️ Mach dich bereit zum Kampf ⚔️", cd_go:"Bereit machen!",
-        back_btn:"🏠 Einstellungen", timer_run:"⏱️ Zeit", fullscreen:"🖥️ Vollbild",
-        blue_team:"🔵 BLAUES TEAM", red_team:"🔴 ROTES TEAM", completed:"Fertig:", reset_left:"🔵 Neustart", reset_right:"🔴 Neustart",
-        modal_replay:"Nochmal ⚔️", modal_setup:"Einstellungen",
-        search_ph:"Suchen ...", no_result:"Keine Ergebnisse", toast:"Sprache geändert.",
-        seo_title:"Emoji-Sortier-König - Wasser-Sortier-Rätsel", seo_desc:"Sortiere Emojis, um die Röhren im 2-Spieler-Duell zu füllen! Blaues gegen Rotes Team in Echtzeit.", seo_keywords:"emoji sortieren, wasser sortier rätsel, sortierspiel, denkspiel" },
-
-      it: { title:"Re dell’Ordinamento Emoji", subtitle:"Affronta la sfida del rompicapo!",
-        diff_label:"Difficoltà", diff_easy:"🟢 Facile", diff_normal:"🟡 Normale", diff_hard:"🔴 Difficile", diff_veryhard:"🔥 Molto Difficile", diff_insane:"💀 Estremo", diff_impossible:"👾 Impossibile",
-        detail_label:"Impostazioni", ctrl_total:"🧪 Tubi Totali", ctrl_empty:"🥛 Tubi Vuoti", ctrl_emoji:"🎨 Tipi di Emoji",
-        time_label:"Tempo Limite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Illimitato",
-        theme_label:"Tema Emoji", theme_mixed:"🎨 Misto", theme_animals:"🦁 Animali", theme_fruits:"🍎 Frutta", theme_foods:"🍔 Cibo", theme_activities:"⚽ Sport",
-        start_btn:"Inizia ⚔️", other_game:"Altri Giochi",
-        cd_ready:"⚔️ Preparati alla battaglia ⚔️", cd_go:"Preparati!",
-        back_btn:"🏠 Impostazioni", timer_run:"⏱️ Tempo", fullscreen:"🖥️ Schermo Intero",
-        blue_team:"🔵 SQUADRA BLU", red_team:"🔴 SQUADRA ROSSA", completed:"Fatto:", reset_left:"🔵 Ricomincia", reset_right:"🔴 Ricomincia",
-        modal_replay:"Gioca Ancora ⚔️", modal_setup:"Impostazioni",
-        search_ph:"Cerca ...", no_result:"Nessun risultato", toast:"Lingua cambiata.",
-        seo_title:"Re dell’Ordinamento Emoji - Rompicapo di Ordinamento Acqua", seo_desc:"Ordina le emoji per riempire i tubi in questo duello a 2 giocatori! Squadra Blu contro Rossa in tempo reale.", seo_keywords:"ordina emoji, rompicapo acqua, gioco di ordinamento, puzzle" },
-
-      "pt-br": { title:"Rei da Ordenação de Emojis", subtitle:"Encare o desafio do quebra-cabeça!",
-        diff_label:"Dificuldade", diff_easy:"🟢 Fácil", diff_normal:"🟡 Normal", diff_hard:"🔴 Difícil", diff_veryhard:"🔥 Muito Difícil", diff_insane:"💀 Insano", diff_impossible:"👾 Impossível",
-        detail_label:"Configurações", ctrl_total:"🧪 Total de Tubos", ctrl_empty:"🥛 Tubos Vazios", ctrl_emoji:"🎨 Tipos de Emoji",
-        time_label:"Tempo Limite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Sem Limite",
-        theme_label:"Tema de Emoji", theme_mixed:"🎨 Misto", theme_animals:"🦁 Animais", theme_fruits:"🍎 Frutas", theme_foods:"🍔 Comidas", theme_activities:"⚽ Esportes",
-        start_btn:"Começar ⚔️", other_game:"Outros Jogos",
-        cd_ready:"⚔️ Prepare-se para a batalha ⚔️", cd_go:"Prepare-se!",
-        back_btn:"🏠 Ajustes", timer_run:"⏱️ Tempo", fullscreen:"🖥️ Tela Cheia",
-        blue_team:"🔵 TIME AZUL", red_team:"🔴 TIME VERMELHO", completed:"Feito:", reset_left:"🔵 Recomeçar", reset_right:"🔴 Recomeçar",
-        modal_replay:"Jogar de Novo ⚔️", modal_setup:"Ajustes",
-        search_ph:"Buscar ...", no_result:"Sem resultados", toast:"Idioma alterado.",
-        seo_title:"Rei da Ordenação de Emojis - Quebra-cabeça de Ordenar Água", seo_desc:"Ordene emojis para encher os tubos neste duelo de 2 jogadores! Time Azul contra Vermelho em tempo real.", seo_keywords:"ordenar emoji, quebra-cabeça de água, jogo de ordenar, puzzle" },
-
-      ru: { title:"Король Сортировки Эмодзи", subtitle:"Прими вызов головоломки!",
-        diff_label:"Сложность", diff_easy:"🟢 Легко", diff_normal:"🟡 Средне", diff_hard:"🔴 Сложно", diff_veryhard:"🔥 Очень сложно", diff_insane:"💀 Безумно", diff_impossible:"👾 Невозможно",
-        detail_label:"Настройки", ctrl_total:"🧪 Всего колб", ctrl_empty:"🥛 Пустые колбы", ctrl_emoji:"🎨 Виды эмодзи",
-        time_label:"Лимит времени", time_1:"⏱️ 1 мин", time_2:"⏱️ 2 мин", time_3:"⏱️ 3 мин", time_4:"⏱️ 4 мин", time_5:"⏱️ 5 мин", time_inf:"♾️ Без лимита",
-        theme_label:"Тема эмодзи", theme_mixed:"🎨 Микс", theme_animals:"🦁 Животные", theme_fruits:"🍎 Фрукты", theme_foods:"🍔 Еда", theme_activities:"⚽ Спорт",
-        start_btn:"Начать бой ⚔️", other_game:"Другие игры",
-        cd_ready:"⚔️ Готовимся к битве ⚔️", cd_go:"Приготовься!",
-        back_btn:"🏠 Настройки", timer_run:"⏱️ Время", fullscreen:"🖥️ Во весь экран",
-        blue_team:"🔵 СИНЯЯ КОМАНДА", red_team:"🔴 КРАСНАЯ КОМАНДА", completed:"Готово:", reset_left:"🔵 Заново", reset_right:"🔴 Заново",
-        modal_replay:"Ещё раз ⚔️", modal_setup:"Настройки",
-        search_ph:"Поиск ...", no_result:"Нет результатов", toast:"Язык изменён.",
-        seo_title:"Король Сортировки Эмодзи - Головоломка сортировки воды", seo_desc:"Сортируй эмодзи и заполняй колбы в этой дуэли на двоих! Синие против Красных в реальном времени.", seo_keywords:"сортировка эмодзи, головоломка воды, игра сортировка, пазл" },
-
-      hi: { title:"इमोजी सॉर्ट किंग", subtitle:"सॉर्ट पहेली की चुनौती लो!",
-        diff_label:"कठिनाई", diff_easy:"🟢 आसान", diff_normal:"🟡 सामान्य", diff_hard:"🔴 कठिन", diff_veryhard:"🔥 बहुत कठिन", diff_insane:"💀 अति कठिन", diff_impossible:"👾 असंभव",
-        detail_label:"सेटिंग्स", ctrl_total:"🧪 कुल ट्यूब", ctrl_empty:"🥛 खाली ट्यूब", ctrl_emoji:"🎨 इमोजी प्रकार",
-        time_label:"समय सीमा", time_1:"⏱️ 1 मिन", time_2:"⏱️ 2 मिन", time_3:"⏱️ 3 मिन", time_4:"⏱️ 4 मिन", time_5:"⏱️ 5 मिन", time_inf:"♾️ असीमित",
-        theme_label:"इमोजी थीम", theme_mixed:"🎨 मिश्रित", theme_animals:"🦁 जानवर", theme_fruits:"🍎 फल", theme_foods:"🍔 भोजन", theme_activities:"⚽ खेल",
-        start_btn:"शुरू करें ⚔️", other_game:"अन्य खेल",
-        cd_ready:"⚔️ लड़ाई के लिए तैयार हो जाओ ⚔️", cd_go:"तैयार हो जाओ!",
-        back_btn:"🏠 सेटिंग्स", timer_run:"⏱️ समय", fullscreen:"🖥️ पूर्ण स्क्रीन",
-        blue_team:"🔵 नीली टीम", red_team:"🔴 लाल टीम", completed:"पूर्ण:", reset_left:"🔵 फिर से", reset_right:"🔴 फिर से",
-        modal_replay:"फिर खेलें ⚔️", modal_setup:"सेटिंग्स",
-        search_ph:"खोजें ...", no_result:"कोई परिणाम नहीं", toast:"भाषा बदल दी गई है।",
-        seo_title:"इमोजी सॉर्ट किंग - वाटर सॉर्ट पहेली", seo_desc:"2 खिलाड़ियों के इस मुकाबले में इमोजी छांटकर ट्यूब भरें! नीली टीम बनाम लाल टीम रियल टाइम में।", seo_keywords:"इमोजी सॉर्ट, वाटर सॉर्ट पहेली, सॉर्ट गेम, दिमागी पहेली" },
-
-      bn: { title:"ইমোজি সর্ট কিং", subtitle:"সাজানোর ধাঁধার চ্যালেঞ্জ নাও!",
-        diff_label:"কঠিনতা", diff_easy:"🟢 সহজ", diff_normal:"🟡 সাধারণ", diff_hard:"🔴 কঠিন", diff_veryhard:"🔥 খুব কঠিন", diff_insane:"💀 অতি কঠিন", diff_impossible:"👾 অসম্ভব",
-        detail_label:"সেটিংস", ctrl_total:"🧪 মোট টিউব", ctrl_empty:"🥛 খালি টিউব", ctrl_emoji:"🎨 ইমোজির ধরন",
-        time_label:"সময় সীমা", time_1:"⏱️ ১ মিন", time_2:"⏱️ ২ মিন", time_3:"⏱️ ৩ মিন", time_4:"⏱️ ৪ মিন", time_5:"⏱️ ৫ মিন", time_inf:"♾️ সীমাহীন",
-        theme_label:"ইমোজি থিম", theme_mixed:"🎨 মিশ্র", theme_animals:"🦁 প্রাণী", theme_fruits:"🍎 ফল", theme_foods:"🍔 খাবার", theme_activities:"⚽ খেলা",
-        start_btn:"শুরু করো ⚔️", other_game:"অন্য গেম",
-        cd_ready:"⚔️ লড়াইয়ের জন্য প্রস্তুত হও ⚔️", cd_go:"প্রস্তুত হও!",
-        back_btn:"🏠 সেটিংস", timer_run:"⏱️ সময়", fullscreen:"🖥️ পূর্ণ স্ক্রিন",
-        blue_team:"🔵 নীল দল", red_team:"🔴 লাল দল", completed:"সম্পন্ন:", reset_left:"🔵 আবার", reset_right:"🔴 আবার",
-        modal_replay:"আবার খেলো ⚔️", modal_setup:"সেটিংস",
-        search_ph:"খুঁজুন ...", no_result:"কোন ফলাফল নেই", toast:"ভাষা পরিবর্তন করা হয়েছে।",
-        seo_title:"ইমোজি সর্ট কিং - ওয়াটার সর্ট ধাঁধা", seo_desc:"২ জনের এই লড়াইয়ে ইমোজি সাজিয়ে টিউব ভরাও! নীল দল বনাম লাল দল রিয়েল টাইমে।", seo_keywords:"ইমোজি সর্ট, ওয়াটার সর্ট ধাঁধা, সাজানো গেম, ধাঁধা" },
-
-      id: { title:"Raja Sortir Emoji", subtitle:"Tantang batas teka-teki sortir!",
-        diff_label:"Kesulitan", diff_easy:"🟢 Mudah", diff_normal:"🟡 Sedang", diff_hard:"🔴 Sulit", diff_veryhard:"🔥 Sangat Sulit", diff_insane:"💀 Gila", diff_impossible:"👾 Mustahil",
-        detail_label:"Pengaturan", ctrl_total:"🧪 Total Tabung", ctrl_empty:"🥛 Tabung Kosong", ctrl_emoji:"🎨 Jenis Emoji",
-        time_label:"Batas Waktu", time_1:"⏱️ 1 mnt", time_2:"⏱️ 2 mnt", time_3:"⏱️ 3 mnt", time_4:"⏱️ 4 mnt", time_5:"⏱️ 5 mnt", time_inf:"♾️ Tanpa Batas",
-        theme_label:"Tema Emoji", theme_mixed:"🎨 Campuran", theme_animals:"🦁 Hewan", theme_fruits:"🍎 Buah", theme_foods:"🍔 Makanan", theme_activities:"⚽ Olahraga",
-        start_btn:"Mulai Duel ⚔️", other_game:"Game Lain",
-        cd_ready:"⚔️ Bersiap untuk bertanding ⚔️", cd_go:"Bersiap!",
-        back_btn:"🏠 Pengaturan", timer_run:"⏱️ Waktu", fullscreen:"🖥️ Layar Penuh",
-        blue_team:"🔵 TIM BIRU", red_team:"🔴 TIM MERAH", completed:"Selesai:", reset_left:"🔵 Ulangi", reset_right:"🔴 Ulangi",
-        modal_replay:"Main Lagi ⚔️", modal_setup:"Pengaturan",
-        search_ph:"Cari ...", no_result:"Tidak ada hasil", toast:"Bahasa telah diubah.",
-        seo_title:"Raja Sortir Emoji - Teka-teki Sortir Air", seo_desc:"Susun emoji untuk mengisi tabung dalam duel 2 pemain! Tim Biru lawan Merah secara langsung.", seo_keywords:"sortir emoji, teka-teki air, game sortir, puzzle otak" },
-
-      vi: { title:"Vua Sắp Xếp Emoji", subtitle:"Thử thách giới hạn xếp hình!",
-        diff_label:"Độ khó", diff_easy:"🟢 Dễ", diff_normal:"🟡 Thường", diff_hard:"🔴 Khó", diff_veryhard:"🔥 Rất khó", diff_insane:"💀 Cực khó", diff_impossible:"👾 Bất khả thi",
-        detail_label:"Cài đặt", ctrl_total:"🧪 Tổng số ống", ctrl_empty:"🥛 Ống trống", ctrl_emoji:"🎨 Loại emoji",
-        time_label:"Giới hạn giờ", time_1:"⏱️ 1 phút", time_2:"⏱️ 2 phút", time_3:"⏱️ 3 phút", time_4:"⏱️ 4 phút", time_5:"⏱️ 5 phút", time_inf:"♾️ Không giới hạn",
-        theme_label:"Chủ đề emoji", theme_mixed:"🎨 Hỗn hợp", theme_animals:"🦁 Động vật", theme_fruits:"🍎 Trái cây", theme_foods:"🍔 Đồ ăn", theme_activities:"⚽ Thể thao",
-        start_btn:"Bắt đầu ⚔️", other_game:"Trò chơi khác",
-        cd_ready:"⚔️ Chuẩn bị chiến đấu ⚔️", cd_go:"Sẵn sàng!",
-        back_btn:"🏠 Cài đặt", timer_run:"⏱️ Thời gian", fullscreen:"🖥️ Toàn màn hình",
-        blue_team:"🔵 ĐỘI XANH", red_team:"🔴 ĐỘI ĐỎ", completed:"Xong:", reset_left:"🔵 Chơi lại", reset_right:"🔴 Chơi lại",
-        modal_replay:"Chơi lại ⚔️", modal_setup:"Cài đặt",
-        search_ph:"Tìm kiếm ...", no_result:"Không có kết quả", toast:"Ngôn ngữ đã được thay đổi.",
-        seo_title:"Vua Sắp Xếp Emoji - Giải đố xếp nước", seo_desc:"Sắp xếp emoji để lấp đầy ống nghiệm trong trận đấu 2 người! Đội Xanh đấu Đội Đỏ theo thời gian thực.", seo_keywords:"sắp xếp emoji, giải đố xếp nước, trò chơi xếp, câu đố" },
-
-      th: { title:"ราชาจัดเรียงอิโมจิ", subtitle:"ท้าทายขีดสุดของเกมจัดเรียง!",
-        diff_label:"ระดับ", diff_easy:"🟢 ง่าย", diff_normal:"🟡 ปานกลาง", diff_hard:"🔴 ยาก", diff_veryhard:"🔥 ยากมาก", diff_insane:"💀 โหด", diff_impossible:"👾 เป็นไปไม่ได้",
-        detail_label:"ตั้งค่า", ctrl_total:"🧪 หลอดทั้งหมด", ctrl_empty:"🥛 หลอดว่าง", ctrl_emoji:"🎨 ชนิดอิโมจิ",
-        time_label:"จำกัดเวลา", time_1:"⏱️ 1 นาที", time_2:"⏱️ 2 นาที", time_3:"⏱️ 3 นาที", time_4:"⏱️ 4 นาที", time_5:"⏱️ 5 นาที", time_inf:"♾️ ไม่จำกัด",
-        theme_label:"ธีมอิโมจิ", theme_mixed:"🎨 ผสม", theme_animals:"🦁 สัตว์", theme_fruits:"🍎 ผลไม้", theme_foods:"🍔 อาหาร", theme_activities:"⚽ กีฬา",
-        start_btn:"เริ่มการต่อสู้ ⚔️", other_game:"เกมอื่น",
-        cd_ready:"⚔️ เตรียมพร้อมสู้ ⚔️", cd_go:"เตรียมตัว!",
-        back_btn:"🏠 ตั้งค่า", timer_run:"⏱️ เวลา", fullscreen:"🖥️ เต็มจอ",
-        blue_team:"🔵 ทีมน้ำเงิน", red_team:"🔴 ทีมแดง", completed:"เสร็จ:", reset_left:"🔵 เริ่มใหม่", reset_right:"🔴 เริ่มใหม่",
-        modal_replay:"เล่นอีกครั้ง ⚔️", modal_setup:"ตั้งค่า",
-        search_ph:"ค้นหา ...", no_result:"ไม่พบผลลัพธ์", toast:"เปลี่ยนภาษาเรียบร้อยแล้ว",
-        seo_title:"ราชาจัดเรียงอิโมจิ - เกมเรียงน้ำ", seo_desc:"จัดเรียงอิโมจิให้เต็มหลอดในเกมต่อสู้ 2 คน! ทีมน้ำเงินปะทะทีมแดงแบบเรียลไทม์", seo_keywords:"จัดเรียงอิโมจิ, เกมเรียงน้ำ, เกมจัดเรียง, เกมปริศนา" },
-
-      tr: { title:"Emoji Sıralama Kralı", subtitle:"Sıralama bulmacasının sınırını zorla!",
-        diff_label:"Zorluk", diff_easy:"🟢 Kolay", diff_normal:"🟡 Normal", diff_hard:"🔴 Zor", diff_veryhard:"🔥 Çok Zor", diff_insane:"💀 Çılgın", diff_impossible:"👾 İmkansız",
-        detail_label:"Ayarlar", ctrl_total:"🧪 Toplam Tüp", ctrl_empty:"🥛 Boş Tüp", ctrl_emoji:"🎨 Emoji Türü",
-        time_label:"Süre Sınırı", time_1:"⏱️ 1 dk", time_2:"⏱️ 2 dk", time_3:"⏱️ 3 dk", time_4:"⏱️ 4 dk", time_5:"⏱️ 5 dk", time_inf:"♾️ Sınırsız",
-        theme_label:"Emoji Teması", theme_mixed:"🎨 Karışık", theme_animals:"🦁 Hayvanlar", theme_fruits:"🍎 Meyveler", theme_foods:"🍔 Yiyecekler", theme_activities:"⚽ Spor",
-        start_btn:"Başla ⚔️", other_game:"Diğer Oyunlar",
-        cd_ready:"⚔️ Savaşa hazırlan ⚔️", cd_go:"Hazır ol!",
-        back_btn:"🏠 Ayarlar", timer_run:"⏱️ Süre", fullscreen:"🖥️ Tam Ekran",
-        blue_team:"🔵 MAVİ TAKIM", red_team:"🔴 KIRMIZI TAKIM", completed:"Bitti:", reset_left:"🔵 Yeniden", reset_right:"🔴 Yeniden",
-        modal_replay:"Tekrar Oyna ⚔️", modal_setup:"Ayarlar",
-        search_ph:"Ara ...", no_result:"Sonuç yok", toast:"Dil değiştirildi.",
-        seo_title:"Emoji Sıralama Kralı - Su Sıralama Bulmacası", seo_desc:"2 kişilik bu düelloda emojileri sıralayıp tüpleri doldur! Mavi Takım Kırmızı Takıma karşı canlı.", seo_keywords:"emoji sıralama, su sıralama bulmaca, sıralama oyunu, zeka oyunu" }
+    /* =========================================================
+       물리 키보드 입력 핸들러 (QWERTY 매핑 & 한글 자모 직접 입력 지원)
+    ========================================================= */
+    const KEY_MAP = {
+      'q': 'ㅂ', 'Q': 'ㅃ',
+      'w': 'ㅈ', 'W': 'ㅉ',
+      'e': 'ㄷ', 'E': 'ㄸ',
+      'r': 'ㄱ', 'R': 'ㄲ',
+      't': 'ㅅ', 'T': 'ㅆ',
+      'y': 'ㅛ', 'Y': 'ㅛ',
+      'u': 'ㅕ', 'U': 'ㅕ',
+      'i': 'ㅑ', 'I': 'ㅑ',
+      'o': 'ㅐ', 'O': 'ㅒ',
+      'p': 'ㅔ', 'P': 'ㅖ',
+      'a': 'ㅁ', 'A': 'ㅁ',
+      's': 'ㄴ', 'S': 'ㄴ',
+      'd': 'ㅇ', 'D': 'ㅇ',
+      'f': 'ㄹ', 'F': 'ㄹ',
+      'g': 'ㅎ', 'G': 'ㅎ',
+      'h': 'ㅗ', 'H': 'ㅗ',
+      'j': 'ㅓ', 'J': 'ㅓ',
+      'k': 'ㅏ', 'K': 'ㅏ',
+      'l': 'ㅣ', 'L': 'ㅣ',
+      'z': 'ㅋ', 'Z': 'ㅋ',
+      'x': 'ㅌ', 'X': 'ㅌ',
+      'c': 'ㅊ', 'C': 'ㅊ',
+      'v': 'ㅍ', 'V': 'ㅍ',
+      'b': 'ㅠ', 'B': 'ㅠ',
+      'n': 'ㅜ', 'N': 'ㅜ',
+      'm': 'ㅡ', 'M': 'ㅡ'
     };
 
-    var SUPPORTED = ['ko','en','zh','ja','es','fr','de','it','pt-br','ru','hi','bn','id','vi','th','tr'];
-    var STORAGE_KEY = 'kingsmath_lang';
-    var currentLang = 'en';
+    const ALL_JAMOS = new Set([
+      'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ',
+      'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', 'ㅣ',
+      'ㄳ', '%EB%89%B6', 'ㄶ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅄ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅢ'
+    ]);
 
-    function getLang(code){ for (var i=0;i<languages.length;i++){ if(languages[i].code===code) return languages[i]; } return null; }
+    // URL decode standard Korean compounds in Jamo Set (e.g. ㄳ, ㄵ, ㄶ, ㄺ, ㄻ, ㄼ, ㄽ, ㄾ, ㄿ, ㅀ, ㅄ)
+    const COMPOUND_JAMOS = ['ㄳ', 'ㄵ', 'ㄶ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅄ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅢ'];
+    COMPOUND_JAMOS.forEach(j => ALL_JAMOS.add(j));
 
-    // 브라우저/파라미터 코드 → 지원 코드 정규화
-    function normalizeLang(raw){
-      if(!raw) return null;
-      raw = String(raw).toLowerCase().replace('_','-');
-      if(raw === 'pt-br' || raw.indexOf('pt') === 0) return 'pt-br';
-      if(raw.indexOf('zh') === 0) return 'zh';
-      if(SUPPORTED.indexOf(raw) !== -1) return raw;
-      var base = raw.split('-')[0];
-      if(SUPPORTED.indexOf(base) !== -1) return base;
-      return null;
-    }
+    window.addEventListener('keydown', (e) => {
+      if (!G || G.checking) return;
+      if ($('#game').classList.contains('hidden')) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
 
-    // 우선순위: URL > localStorage > navigator > en
-    function detectLang(){
-      try {
-        var fromUrl = normalizeLang(new URLSearchParams(window.location.search).get('lang'));
-        if(fromUrl) return fromUrl;
-      } catch(e){}
-      try {
-        var stored = normalizeLang(localStorage.getItem(STORAGE_KEY));
-        if(stored) return stored;
-      } catch(e){}
-      try {
-        var navs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
-        for(var i=0;i<navs.length;i++){ var n = normalizeLang(navs[i]); if(n) return n; }
-      } catch(e){}
-      return 'en';
-    }
+      const key = e.key;
+      if (key.startsWith('F') && key.length > 1) return;
 
-    // 긴 번역이 버튼을 벗어나지 않도록 폰트 크기 동적 축소 (모달/게임 CSS와 무관, 인라인 스타일만)
-    function fitText(el, minPx){
-      if(!el) return;
-      el.style.fontSize = '';
-      var size = parseFloat(getComputedStyle(el).fontSize) || 14;
-      var prevWs = el.style.whiteSpace;
-      el.style.whiteSpace = 'nowrap';
-      var guard = 0;
-      while(el.scrollWidth > el.clientWidth + 1 && size > minPx && guard < 60){
-        size -= 0.5; el.style.fontSize = size + 'px'; guard++;
+      if (key === 'Backspace') {
+        e.preventDefault();
+        G.composer.backspace();
+        updatePreview();
+        sfxKey();
+      } else if (key === 'Enter') {
+        e.preventDefault();
+        submitKeypad();
+      } else if (KEY_MAP[key]) {
+        e.preventDefault();
+        G.composer.input(KEY_MAP[key]);
+        updatePreview();
+        sfxKey();
+      } else if (ALL_JAMOS.has(key)) {
+        e.preventDefault();
+        G.composer.input(key);
+        updatePreview();
+        sfxKey();
       }
-      el.style.whiteSpace = prevWs;
-    }
+    });
 
-    function setText(sel, val){ var el = document.querySelector(sel); if(el && val != null) el.textContent = val; }
-
-    function applyI18n(lang){
-      var t = T[lang] || T.en;
-
-      // 설정 화면
-      setText('.setup-header h1', t.title);
-      setText('.setup-header p', t.subtitle);
-
-      var diffGrid = document.getElementById('difficulty-options');
-      if(diffGrid){ var dh = diffGrid.closest('.setting-section').querySelector('h3'); if(dh) dh.textContent = t.diff_label; }
-      var diffMap = { easy:t.diff_easy, normal:t.diff_normal, hard:t.diff_hard, veryhard:t.diff_veryhard, insane:t.diff_insane, impossible:t.diff_impossible };
-      Object.keys(diffMap).forEach(function(k){ var b = document.querySelector('#difficulty-options .option-btn[data-value="'+k+'"]'); if(b) b.textContent = diffMap[k]; });
-
-      var detGrid = document.querySelector('.compact-controls-grid');
-      if(detGrid){ var deh = detGrid.closest('.setting-section').querySelector('h3'); if(deh) deh.textContent = t.detail_label; }
-      var labels = document.querySelectorAll('.control-label');
-      if(labels[0]) labels[0].textContent = t.ctrl_total;
-      if(labels[1]) labels[1].textContent = t.ctrl_empty;
-      if(labels[2]) labels[2].textContent = t.ctrl_emoji;
-
-      var timeGrid = document.getElementById('time-options');
-      if(timeGrid){ var th3 = timeGrid.closest('.setting-section').querySelector('h3'); if(th3) th3.textContent = t.time_label; }
-      var timeMap = { '60':t.time_1, '120':t.time_2, '180':t.time_3, '240':t.time_4, '300':t.time_5, 'infinite':t.time_inf };
-      Object.keys(timeMap).forEach(function(k){ var b = document.querySelector('#time-options .option-btn[data-value="'+k+'"]'); if(b) b.textContent = timeMap[k]; });
-
-      var themeWrap = document.querySelector('.theme-options');
-      if(themeWrap){ var thh = themeWrap.closest('.setting-section').querySelector('h3'); if(thh) thh.textContent = t.theme_label; }
-      var themeMap = { mixed:t.theme_mixed, animals:t.theme_animals, fruits:t.theme_fruits, foods:t.theme_foods, activities:t.theme_activities };
-      Object.keys(themeMap).forEach(function(k){ var b = document.querySelector('.theme-btn[data-theme="'+k+'"]'); if(b) b.textContent = themeMap[k]; });
-
-      setText('#start-btn', t.start_btn);
-      setText('#other-game-btn', t.other_game);
-
-      // 카운트다운 / 게임 화면 정적 텍스트
-      setText('#countdown-screen h2', t.cd_ready);
-      setText('#countdown-screen > div > p', t.cd_go);
-      setText('#back-btn', t.back_btn);
-      if(!document.fullscreenElement) setText('#timer-label', t.timer_run);
-      var fsb = document.getElementById('fullscreen-btn');
-      if(fsb && !document.fullscreenElement) fsb.textContent = t.fullscreen;
-      setText('#left-team-title', t.blue_team);
-      setText('#right-team-title', t.red_team);
-      var cls = document.querySelectorAll('.km-completed-label');
-      for(var i=0;i<cls.length;i++) cls[i].textContent = t.completed;
-      setText('#reset-left-btn', t.reset_left);
-      setText('#reset-right-btn', t.reset_right);
-      setText('#modal-replay-btn', t.modal_replay);
-      setText('#modal-setup-btn', t.modal_setup);
-
-      // 모달 자체 텍스트
-      var si = document.getElementById('kmSearchInput'); if(si) si.placeholder = t.search_ph;
-      var nr = document.querySelector('#kmNoResult p'); if(nr) nr.textContent = t.no_result;
-
-      // 폰트 자동 맞춤 (넘칠 때만 축소)
-      ['#start-btn','#other-game-btn','#reset-left-btn','#reset-right-btn','#back-btn','#fullscreen-btn','#modal-replay-btn','#modal-setup-btn'].forEach(function(s){ fitText(document.querySelector(s), 9); });
-    }
-
-    function applySEO(lang){
-      var t = T[lang] || T.en;
-      document.title = t.seo_title || t.title;
-      setMeta('description', t.seo_desc);
-      setMeta('keywords', t.seo_keywords);
-    }
-    function setMeta(name, content){
-      if(content == null) return;
-      var m = document.querySelector('meta[name="'+name+'"]');
-      if(!m){ m = document.createElement('meta'); m.setAttribute('name', name); document.head.appendChild(m); }
-      m.setAttribute('content', content);
-    }
-
-    function setLanguage(code, opts){
-      opts = opts || {};
-      if(!T[code]) code = 'en';
-      currentLang = code;
-
-      applyI18n(code);
-      applySEO(code);
-
-      var htmlLang = (code === 'pt-br') ? 'pt-BR' : (code === 'zh' ? 'zh-CN' : code);
-      document.documentElement.setAttribute('lang', htmlLang);
-
-      if(opts.save !== false){ try { localStorage.setItem(STORAGE_KEY, code); } catch(e){} }
-
-      if(opts.url !== false){
-        try {
-          var url = new URL(window.location.href);
-          url.searchParams.set('lang', code);
-          if(opts.replace) history.replaceState({ kmLang: code }, '', url.toString());
-          else history.pushState({ kmLang: code }, '', url.toString());
-        } catch(e){}
-      }
-
-      // 트리거 버튼 갱신
-      var L = getLang(code);
-      if(L){
-        var f = document.getElementById('kmCurrentFlag'); if(f) f.src = 'https://flagcdn.com/w40/'+L.country+'.png';
-        var n = document.getElementById('kmCurrentName'); if(n) n.textContent = L.name;
-      }
-
-      var si = document.getElementById('kmSearchInput');
-      renderLanguages(si ? si.value : '');
-    }
-
-    // [요구8] 모달 목록 렌더 함수
-    function renderLanguages(filterText){
-      var grid = document.getElementById('kmLangGrid');
-      var noRes = document.getElementById('kmNoResult');
-      if(!grid) return;
-      var f = (filterText || '').toLowerCase();
-      grid.innerHTML = '';
-
-      var list = languages.filter(function(l){
-        return l.name.toLowerCase().indexOf(f) !== -1 ||
-               l.enName.toLowerCase().indexOf(f) !== -1 ||
-               l.code.toLowerCase().indexOf(f) !== -1;
-      });
-
-      if(list.length === 0){
-        grid.style.display = 'none';
-        if(noRes) noRes.classList.add('km-show');
-        return;
-      }
-      grid.style.display = 'grid';
-      if(noRes) noRes.classList.remove('km-show');
-
-      list.forEach(function(l){
-        var selected = (l.code === currentLang);
-        var item = document.createElement('div');
-        item.className = 'km-lang-item' + (selected ? ' km-selected' : '');
-        item.innerHTML =
-          '<div class="km-item-flag"><img src="https://flagcdn.com/w40/'+l.country+'.png" alt="'+l.country+'"></div>' +
-          '<div class="km-item-txt"><span class="km-item-name">'+l.name+'</span><span class="km-item-sub">'+l.enName+'</span></div>' +
-          (selected ? '<i class="fa-solid fa-circle-check km-check"></i>' : '');
-        item.addEventListener('click', function(){ selectLanguage(l); });
-        grid.appendChild(item);
-      });
-    }
-
-    // [요구9] 언어 선택 시 반드시 모달 닫기
-    function selectLanguage(lang){
-      setLanguage(lang.code, {});   // save + url pushState
-      closeModal();                 // 모달 닫힘 보장
-      showToast(lang);
-    }
-
-    var modal = null, toastTimeout = null;
-    function openModal(){
-      modal = modal || document.getElementById('langModal');
-      if(!modal) return;
-      modal.classList.add('km-active');
-      modal.setAttribute('aria-hidden', 'false');
-      var si = document.getElementById('kmSearchInput');
-      if(si){ si.value=''; renderLanguages(''); setTimeout(function(){ si.focus(); }, 120); }
-    }
-    function closeModal(){
-      modal = modal || document.getElementById('langModal');
-      if(!modal) return;
-      modal.classList.remove('km-active');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    function showToast(lang){
-      var toast = document.getElementById('kmToast');
-      if(!toast) return;
-      var t = T[lang.code] || T.en;
-      var msgEl = document.getElementById('kmToastMsg');
-      var subEl = document.getElementById('kmToastLang');
-      if(msgEl) msgEl.textContent = t.toast;
-      if(subEl) subEl.textContent = lang.name;
-      toast.classList.add('km-show');
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(function(){ toast.classList.remove('km-show'); }, 3000);
-    }
-
-    // 언어 선택기는 첫(설정) 화면에서만 노출, 게임/카운트다운 화면에서는 숨김
-    function updateTriggerVisibility(){
-      var setup = document.getElementById('setup-screen');
-      var trigger = document.getElementById('kmLangTrigger');
-      if(!trigger) return;
-      var show = !!(setup && setup.classList.contains('active'));
-      trigger.style.display = show ? 'block' : 'none';
-      if(!show) closeModal();
-    }
-
-    function init(){
-      // [요구8] 초기 목록 렌더링
-      renderLanguages();
-
-      // 이벤트 바인딩
-      var btn = document.getElementById('kmLangBtn');
-      var closeBtn = document.getElementById('kmCloseBtn');
-      var search = document.getElementById('kmSearchInput');
-      modal = document.getElementById('langModal');
-
-      if(btn) btn.addEventListener('click', openModal);
-      if(closeBtn) closeBtn.addEventListener('click', closeModal);
-      if(modal) modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
-      document.addEventListener('keydown', function(e){
-        if(e.key === 'Escape' && modal && modal.classList.contains('km-active')) closeModal();
-      });
-      if(search) search.addEventListener('input', function(e){ renderLanguages(e.target.value); });
-
-      // 화면 전환 감지 → 트리거 노출 제어
-      ['setup-screen','countdown-screen','game-screen'].forEach(function(id){
-        var el = document.getElementById(id);
-        if(el){ new MutationObserver(updateTriggerVisibility).observe(el, { attributes:true, attributeFilter:['class'] }); }
-      });
-      updateTriggerVisibility();
-
-      // 뒤로/앞으로 가기 시 URL 언어 반영
-      window.addEventListener('popstate', function(){
-        var p = null;
-        try { p = new URLSearchParams(window.location.search).get('lang'); } catch(e){}
-        var l = normalizeLang(p) || currentLang;
-        setLanguage(l, { url:false });
-      });
-
-      // 초기 언어 적용 (기기 언어 감지 시 저장은 하지 않고, URL만 반영)
-      var initial = detectLang();
-      setLanguage(initial, { save:false, replace:true });
-    }
-
-    // 전역 노출 (요구4의 홈 로직 등에서 재사용 가능하도록)
-    window.KMI18n = { setLanguage: setLanguage, renderLanguages: renderLanguages, openModal: openModal, closeModal: closeModal };
-
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
-  })();
+    /* init */
+    buildSetup();
   </script>
 </body>
+
 </html>
