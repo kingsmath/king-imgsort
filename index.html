@@ -11,10 +11,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>이모지 소트 배틀킹</title>
+  <!-- [다국어] 동적으로 교체되는 SEO 메타 태그 -->
+  <meta name="description" content="이모지를 정렬해 비커를 완성하는 2인 대전 퍼즐! 블루팀 vs 레드팀 실시간 배틀.">
+  <meta name="keywords" content="이모지 소트, 물 정렬 퍼즐, 배틀킹, 킹수학, 정렬 게임">
   <!-- Google Fonts 구글 폰트 적용 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Color+Emoji&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- [다국어 모달 전용] Font Awesome 아이콘 (모달/버튼 아이콘 전용, 게임과 무관) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     /* ----------------------------------
@@ -123,7 +128,7 @@
 
     .setup-container {
       width: 100%;
-      max-width: 820px;
+      max-width: 720px;
       animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -753,8 +758,243 @@
       100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.25); }
     }
   </style>
+
+  <!-- =========================================================
+       [다국어 언어 선택기 전용 스타일 - 게임 CSS와 100% 분리]
+       · 모든 규칙을 #kmLangTrigger / #langModal / #kmToast 로 스코프
+       · 게임의 클래스(.modal, .modal-content 등)와 절대 겹치지 않게 km- 접두어 사용
+       · 폰트/사이즈 규칙이 게임으로 새어나가지 않도록 컨테이너 단위로만 지정
+       ========================================================= -->
+  <style id="km-lang-style">
+    /* [요구10] 모달 내부 박스 사이징 강제 보정 */
+    #langModal, #langModal * { box-sizing: border-box !important; }
+
+    /* [요구14] Font Awesome 아이콘은 고유 폰트를 유지 → 네모(□) 깨짐 방지.
+       모달 안의 * 에 sans-serif 를 강제하지 않고, 아이콘 폰트만 명시적으로 보호 */
+    #langModal i[class*="fa-"],
+    #kmLangTrigger i[class*="fa-"],
+    #kmToast i[class*="fa-"] {
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+    }
+
+    /* [요구7] 한글은 기존 Noto Sans KR, 그 외 무난한 시스템 sans-serif */
+    #kmLangTrigger, #langModal, #kmToast {
+      font-family: 'Noto Sans KR', 'Segoe UI', system-ui, -apple-system, 'Malgun Gothic', Arial, sans-serif;
+      line-height: 1.3;
+    }
+
+    /* ---- 우측 상단 트리거 버튼 [요구: z-index 최상단] ---- */
+    #kmLangTrigger { position: fixed; top: 14px; right: 14px; z-index: 99999; }
+    #kmLangBtn {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(31, 41, 55, 0.78);
+      border: 1px solid #4b5563; border-radius: 999px;
+      padding: 8px 14px; color: #f3f4f6;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+    #kmLangBtn:hover { background: rgba(55, 65, 81, 0.95); }
+    #kmLangBtn .km-ic { color: #9ca3af; }
+    #kmLangBtn .km-flag { width: 22px; height: auto; border-radius: 2px; display: block; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+    #kmLangBtn .km-cur-name { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #kmLangBtn .km-chev { font-size: 11px; }
+    @media (max-width: 640px) { #kmLangBtn .km-cur-name { display: none; } }
+
+    /* ---- 모달 오버레이 [요구: z-index 최상단] ---- */
+    #langModal {
+      position: fixed; inset: 0; z-index: 100000;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 64px 16px 16px;
+      background: rgba(0, 0, 0, 0.6);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    @media (min-width: 640px) { #langModal { align-items: center; padding: 16px; } }
+    #langModal.km-active { opacity: 1; visibility: visible; }
+
+    /* 게임 전역 * { user-select:none; touch-action:none } 를 모달 안에서만 되돌림 */
+    #langModal input { user-select: text; -webkit-user-select: text; touch-action: auto; }
+    #langModal .km-modal-body { touch-action: pan-y; }
+
+    .km-modal-box {
+      background: #111827; border: 1px solid #374151;
+      border-radius: 18px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+      width: 100%; max-width: 860px; max-height: 85vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: scale(0.96) translateY(-8px); transition: transform 0.25s ease;
+    }
+    #langModal.km-active .km-modal-box { transform: scale(1) translateY(0); }
+
+    .km-modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px; border-bottom: 1px solid #1f2937;
+    }
+    .km-modal-title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #fff; }
+    .km-modal-title .km-ic-y { color: #f59e0b; }
+    .km-close {
+      width: 38px; height: 38px; border: none; border-radius: 999px;
+      background: #1f2937; color: #9ca3af; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .km-close:hover { background: #374151; color: #fff; }
+
+    .km-modal-search { padding: 16px 20px 6px; position: relative; }
+    .km-search-ic { position: absolute; left: 34px; top: 50%; transform: translateY(-30%); color: #9ca3af; pointer-events: none; }
+    #kmSearchInput {
+      width: 100%; background: #1f2937; border: 1px solid #374151; color: #fff;
+      font-size: 14px; border-radius: 12px; padding: 13px 14px 13px 42px; outline: none;
+    }
+    #kmSearchInput::placeholder { color: #6b7280; }
+    #kmSearchInput:focus { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35); }
+
+    .km-modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+    .km-modal-body::-webkit-scrollbar { width: 8px; }
+    .km-modal-body::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    .km-modal-body::-webkit-scrollbar-track { background: rgba(31, 41, 55, 0.5); border-radius: 4px; }
+
+    .km-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 10px; }
+    @media (min-width: 640px)  { .km-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .km-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1280px) { .km-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .km-lang-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      border-radius: 12px; border: 1px solid #374151; background: rgba(31, 41, 55, 0.4);
+      cursor: pointer; transition: background 0.15s, border-color 0.15s; overflow: hidden;
+    }
+    .km-lang-item:hover { background: #374151; border-color: #6b7280; }
+    .km-lang-item.km-selected { background: #1f2937; border-color: #f59e0b; box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.5); }
+    .km-item-flag { flex-shrink: 0; width: 34px; height: 24px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(107, 114, 128, 0.5); }
+    .km-item-flag img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .km-item-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .km-item-name { font-size: 14px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .km-lang-item.km-selected .km-item-name { color: #fbbf24; }
+    .km-item-sub { font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .km-check { color: #f59e0b; font-size: 16px; margin-left: 6px; }
+
+    .km-noresult { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: #6b7280; gap: 10px; }
+    .km-noresult.km-show { display: flex; }
+    .km-noresult i { font-size: 34px; }
+
+    /* ---- 토스트 알림 ---- */
+    #kmToast {
+      position: fixed; bottom: 22px; right: 22px; z-index: 100001;
+      background: #1f2937; border: 1px solid #374151;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); border-radius: 12px;
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+      transform: translateY(160%); opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    #kmToast.km-show { transform: translateY(0); opacity: 1; }
+    .km-toast-ic { width: 32px; height: 32px; border-radius: 999px; background: rgba(16, 185, 129, 0.2); color: #34d399; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .km-toast-msg { font-size: 14px; font-weight: 500; color: #fff; }
+    .km-toast-sub { font-size: 12px; color: #9ca3af; }
+  </style>
+
+  <!-- =========================================================
+       [해상도 최적화] 1920x1080 / 1536x864 / 1366x768 / 1334x800 /
+       1280x800 / 1205x753 등에서 상단 헤더로 하단이 잘리지 않고
+       화면을 정확히 꽉 채우도록 보정. (기존 게임 규칙은 유지하고 오버라이드만)
+       ========================================================= -->
+  <style id="km-responsive-fix">
+    /* 게임 실행 화면: 남은 공간을 flex로 정확히 채우기 */
+    #game-screen { height: 100%; min-height: 0; overflow: hidden; }
+
+    /*
+      핵심: flex 자식의 기본 min-height:auto 때문에 비커 보드가 콘텐츠 높이만큼
+      버티면서 하단 '다시 시작' 버튼이 밀려 잘리는 문제를 min-height:0 으로 해결.
+      (100vh 고정 대신 실제 뷰포트 높이에 맞춰 채움 → 상단 헤더 잘림 방지)
+    */
+    #game-screen .battle-arena {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+    }
+    #game-screen .team-side { min-height: 0; }
+    #game-screen .beaker-board { min-height: 0; min-width: 0; }
+
+    /* 세로가 낮은 해상도(768 / 753 / 800 등)에서 설정 카드가 세로로 잘리지 않도록 콤팩트화 */
+    @media (max-height: 820px) {
+      #setup-screen { padding: 8px; }
+      .setup-header { margin-bottom: 4px; }
+      .logo-emoji { font-size: 2rem; margin-bottom: 2px; }
+      .setup-header h1 { font-size: 1.8rem; }
+      .setup-header p { font-size: 0.82rem; }
+      .setup-card { padding: 14px 16px; }
+      .setting-section { margin-bottom: 10px; }
+      .flex-row-align { padding-bottom: 8px; }
+      .compact-controls-grid { padding: 8px; gap: 8px; }
+      .primary-btn { height: 42px; }
+    }
+    @media (max-height: 700px) {
+      .logo-emoji { font-size: 1.5rem; }
+      .setup-header h1 { font-size: 1.45rem; }
+      .setup-card { padding: 12px 14px; }
+      .setting-section { margin-bottom: 8px; }
+      .number-control-btn { height: 32px; }
+      .primary-btn { height: 40px; }
+    }
+
+    /* 초대형 전자칠판/FHD 이상에서 설정 카드가 너무 작아 보이지 않도록 폭 확장 */
+    @media (min-width: 1600px) {
+      .setup-container { max-width: 72 0px; }
+    }
+
+    /* 언어 트리거가 설정 화면 상단 우측에서 헤더 텍스트와 겹치지 않도록 낮은 높이에서 살짝 축소 */
+    @media (max-height: 700px) {
+      #kmLangBtn { padding: 6px 12px; font-size: 13px; }
+    }
+  </style>
 </head>
 <body>
+  <!-- ============================================================
+       [다국어 언어 선택기] 우측 상단 트리거 버튼 (첫 화면에서만 노출)
+       ============================================================ -->
+  <div id="kmLangTrigger">
+    <button id="kmLangBtn" type="button" aria-label="Language">
+      <i class="fa-solid fa-globe km-ic"></i>
+      <img id="kmCurrentFlag" class="km-flag" src="https://flagcdn.com/w40/us.png" alt="flag">
+      <span id="kmCurrentName" class="km-cur-name">English</span>
+      <i class="fa-solid fa-chevron-down km-ic km-chev"></i>
+    </button>
+  </div>
+
+  <!-- [다국어] 검색창 포함 언어 선택 모달 -->
+  <div id="langModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="km-modal-box">
+      <div class="km-modal-head">
+        <h2 class="km-modal-title">
+          <i class="fa-solid fa-language km-ic-y"></i>
+          <span>Language / 언어</span>
+        </h2>
+        <button id="kmCloseBtn" type="button" class="km-close" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="km-modal-search">
+        <i class="fa-solid fa-magnifying-glass km-search-ic"></i>
+        <input type="text" id="kmSearchInput" placeholder="Search / 검색 ..." autocomplete="off">
+      </div>
+      <div class="km-modal-body">
+        <div id="kmLangGrid" class="km-grid"></div>
+        <div id="kmNoResult" class="km-noresult">
+          <i class="fa-regular fa-face-frown-open"></i>
+          <p>No results</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [다국어] 변경 완료 토스트 -->
+  <div id="kmToast">
+    <div class="km-toast-ic"><i class="fa-solid fa-check"></i></div>
+    <div>
+      <p id="kmToastMsg" class="km-toast-msg">Language changed.</p>
+      <p id="kmToastLang" class="km-toast-sub">English</p>
+    </div>
+  </div>
+
   <!-- 배경 장식용 그라데이션 오라 -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
@@ -901,7 +1141,7 @@
         <div class="team-header">
           <h2 class="team-name" id="left-team-title">🔵 BLUE TEAM</h2>
           <div class="team-progress">
-            완료: <span id="left-completed">0</span> / <span id="left-total">8</span>
+            <span class="km-completed-label">완료:</span> <span id="left-completed">0</span> / <span id="left-total">8</span>
           </div>
         </div>
         <div id="left-beaker-board" class="beaker-board" data-side="left"></div>
@@ -918,7 +1158,7 @@
         <div class="team-header">
           <h2 class="team-name" id="right-team-title">🔴 RED TEAM</h2>
           <div class="team-progress">
-            완료: <span id="right-completed">0</span> / <span id="right-total">8</span>
+            <span class="km-completed-label">완료:</span> <span id="right-completed">0</span> / <span id="right-total">8</span>
           </div>
         </div>
         <div id="right-beaker-board" class="beaker-board" data-side="right"></div>
@@ -2410,6 +2650,524 @@
     function closeWinModal() {
       if (DOM.winModal) DOM.winModal.classList.remove('active');
     }
+  </script>
+
+  <!-- ============================================================
+       [다국어(i18n) 엔진 - 게임 로직과 완전히 독립된 별도 스크립트]
+       · 게임 코드는 일절 수정하지 않고, DOM 텍스트만 갱신
+       · 우선순위: URL(?lang=) > localStorage('kingsmath_lang') > navigator.language > 기본 en
+       ============================================================ -->
+  <script>
+  (function () {
+    // 16개국 언어 데이터 (국기/표시명)
+    var languages = [
+      { code: 'ko',    country: 'kr', name: '한국어',            enName: 'Korean' },
+      { code: 'en',    country: 'us', name: 'English',           enName: 'English' },
+      { code: 'zh',    country: 'cn', name: '中文 (简体)',        enName: 'Chinese (Simplified)' },
+      { code: 'ja',    country: 'jp', name: '日本語',            enName: 'Japanese' },
+      { code: 'es',    country: 'es', name: 'Español',           enName: 'Spanish' },
+      { code: 'fr',    country: 'fr', name: 'Français',          enName: 'French' },
+      { code: 'de',    country: 'de', name: 'Deutsch',           enName: 'German' },
+      { code: 'it',    country: 'it', name: 'Italiano',          enName: 'Italian' },
+      { code: 'pt-br', country: 'br', name: 'Português (BR)',    enName: 'Portuguese (Brazil)' },
+      { code: 'ru',    country: 'ru', name: 'Русский',           enName: 'Russian' },
+      { code: 'hi',    country: 'in', name: 'हिन्दी',             enName: 'Hindi' },
+      { code: 'bn',    country: 'bd', name: 'বাংলা',             enName: 'Bengali' },
+      { code: 'id',    country: 'id', name: 'Bahasa Indonesia',  enName: 'Indonesian' },
+      { code: 'vi',    country: 'vn', name: 'Tiếng Việt',        enName: 'Vietnamese' },
+      { code: 'th',    country: 'th', name: 'ไทย',               enName: 'Thai' },
+      { code: 'tr',    country: 'tr', name: 'Türkçe',            enName: 'Turkish' }
+    ];
+
+    // 각 나라 초등 수학 눈높이의 쉬운 어휘로 번역 (범용 처리 아님, 언어별 개별 번역)
+    var T = {
+      ko: { title:"이모지 소트 배틀킹", subtitle:"소트 퍼즐 한계에 도전하라!",
+        diff_label:"난이도 프리셋", diff_easy:"🟢 쉬움", diff_normal:"🟡 보통", diff_hard:"🔴 어려움", diff_veryhard:"🔥 완전 어려움", diff_insane:"💀 핵 어려움", diff_impossible:"👾 불가능",
+        detail_label:"상세 설정 조절", ctrl_total:"🧪 총 비커 수", ctrl_empty:"🥛 빈 비커 수", ctrl_emoji:"🎨 이모지 종류 수",
+        time_label:"시간 제한", time_1:"⏱️ 1분", time_2:"⏱️ 2분", time_3:"⏱️ 3분", time_4:"⏱️ 4분", time_5:"⏱️ 5분", time_inf:"♾️ 무제한",
+        theme_label:"이모지 테마", theme_mixed:"🎨 혼합", theme_animals:"🦁 동물원", theme_fruits:"🍎 과일", theme_foods:"🍔 음식", theme_activities:"⚽ 스포츠",
+        start_btn:"배틀킹 시작하기 ⚔️", other_game:"다른 게임 고르기",
+        cd_ready:"⚔️ 이모지소트를 시작합니다 ⚔️", cd_go:"준비하세요!",
+        back_btn:"🏠 설정 변경", timer_run:"⏱️ 진행 시간", fullscreen:"🖥️ 전체화면",
+        blue_team:"🔵 BLUE TEAM", red_team:"🔴 RED TEAM", completed:"완료:", reset_left:"🔵 다시 시작", reset_right:"🔴 다시 시작",
+        modal_replay:"한 판 더 ⚔️", modal_setup:"설정 변경",
+        search_ph:"검색 ...", no_result:"검색 결과 없음", toast:"언어가 변경되었습니다.",
+        seo_title:"이모지 소트 배틀킹 - 물 붓기 정렬 퍼즐 대전", seo_desc:"이모지를 정렬해 비커를 완성하는 2인 대전 퍼즐! 블루팀 vs 레드팀 실시간 배틀.", seo_keywords:"이모지 소트, 물 정렬 퍼즐, 배틀킹, 킹수학, 정렬 게임" },
+
+      en: { title:"Emoji Sort Battle King", subtitle:"Take on the ultimate sorting puzzle!",
+        diff_label:"Difficulty", diff_easy:"🟢 Easy", diff_normal:"🟡 Normal", diff_hard:"🔴 Hard", diff_veryhard:"🔥 Very Hard", diff_insane:"💀 Insane", diff_impossible:"👾 Impossible",
+        detail_label:"Detailed Settings", ctrl_total:"🧪 Total Tubes", ctrl_empty:"🥛 Empty Tubes", ctrl_emoji:"🎨 Emoji Types",
+        time_label:"Time Limit", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ No Limit",
+        theme_label:"Emoji Theme", theme_mixed:"🎨 Mixed", theme_animals:"🦁 Animals", theme_fruits:"🍎 Fruits", theme_foods:"🍔 Foods", theme_activities:"⚽ Sports",
+        start_btn:"Start Battle ⚔️", other_game:"Other Games",
+        cd_ready:"⚔️ Get Ready to Battle ⚔️", cd_go:"Get ready!",
+        back_btn:"🏠 Settings", timer_run:"⏱️ Time", fullscreen:"🖥️ Fullscreen",
+        blue_team:"🔵 BLUE TEAM", red_team:"🔴 RED TEAM", completed:"Done:", reset_left:"🔵 Restart", reset_right:"🔴 Restart",
+        modal_replay:"Play Again ⚔️", modal_setup:"Settings",
+        search_ph:"Search ...", no_result:"No results", toast:"Language changed.",
+        seo_title:"Emoji Sort Battle King - Water Sort Puzzle Duel", seo_desc:"Sort emojis to fill the tubes in this 2-player puzzle duel! Blue Team vs Red Team in real time.", seo_keywords:"emoji sort, water sort puzzle, sort game, battle king, brain puzzle" },
+
+      zh: { title:"表情分类对战王", subtitle:"挑战分类益智的极限！",
+        diff_label:"难度", diff_easy:"🟢 简单", diff_normal:"🟡 普通", diff_hard:"🔴 困难", diff_veryhard:"🔥 超难", diff_insane:"💀 疯狂", diff_impossible:"👾 不可能",
+        detail_label:"详细设置", ctrl_total:"🧪 试管总数", ctrl_empty:"🥛 空试管数", ctrl_emoji:"🎨 表情种类",
+        time_label:"时间限制", time_1:"⏱️ 1分钟", time_2:"⏱️ 2分钟", time_3:"⏱️ 3分钟", time_4:"⏱️ 4分钟", time_5:"⏱️ 5分钟", time_inf:"♾️ 无限制",
+        theme_label:"表情主题", theme_mixed:"🎨 混合", theme_animals:"🦁 动物", theme_fruits:"🍎 水果", theme_foods:"🍔 食物", theme_activities:"⚽ 运动",
+        start_btn:"开始对战 ⚔️", other_game:"其他游戏",
+        cd_ready:"⚔️ 准备对战 ⚔️", cd_go:"准备好！",
+        back_btn:"🏠 设置", timer_run:"⏱️ 时间", fullscreen:"🖥️ 全屏",
+        blue_team:"🔵 蓝队", red_team:"🔴 红队", completed:"完成：", reset_left:"🔵 重新开始", reset_right:"🔴 重新开始",
+        modal_replay:"再玩一局 ⚔️", modal_setup:"设置",
+        search_ph:"搜索 ...", no_result:"没有结果", toast:"语言已更改。",
+        seo_title:"表情分类对战王 - 倒水分类益智对战", seo_desc:"整理表情填满试管的双人益智对战！蓝队对红队实时较量。", seo_keywords:"表情分类, 倒水排序, 分类游戏, 益智对战" },
+
+      ja: { title:"絵文字ソート バトルキング", subtitle:"ソートパズルの限界に挑戦！",
+        diff_label:"難易度", diff_easy:"🟢 かんたん", diff_normal:"🟡 ふつう", diff_hard:"🔴 むずかしい", diff_veryhard:"🔥 超むずかしい", diff_insane:"💀 激ムズ", diff_impossible:"👾 不可能",
+        detail_label:"詳細設定", ctrl_total:"🧪 試験管の数", ctrl_empty:"🥛 空の試験管", ctrl_emoji:"🎨 絵文字の種類",
+        time_label:"制限時間", time_1:"⏱️ 1分", time_2:"⏱️ 2分", time_3:"⏱️ 3分", time_4:"⏱️ 4分", time_5:"⏱️ 5分", time_inf:"♾️ 無制限",
+        theme_label:"絵文字テーマ", theme_mixed:"🎨 ミックス", theme_animals:"🦁 どうぶつ", theme_fruits:"🍎 くだもの", theme_foods:"🍔 たべもの", theme_activities:"⚽ スポーツ",
+        start_btn:"バトル開始 ⚔️", other_game:"ほかのゲーム",
+        cd_ready:"⚔️ バトルの準備中 ⚔️", cd_go:"準備して！",
+        back_btn:"🏠 設定", timer_run:"⏱️ タイム", fullscreen:"🖥️ 全画面",
+        blue_team:"🔵 ブルーチーム", red_team:"🔴 レッドチーム", completed:"完了:", reset_left:"🔵 やり直す", reset_right:"🔴 やり直す",
+        modal_replay:"もう一回 ⚔️", modal_setup:"設定",
+        search_ph:"検索 ...", no_result:"結果がありません", toast:"言語が変更されました。",
+        seo_title:"絵文字ソート バトルキング - 水ソートパズル対戦", seo_desc:"絵文字を並べて試験管を完成させる2人対戦パズル！ブルー対レッドのリアルタイムバトル。", seo_keywords:"絵文字ソート, 水ソートパズル, 並べ替えゲーム, 対戦パズル" },
+
+      es: { title:"Rey de Clasificación Emoji", subtitle:"¡Supera el reto del rompecabezas!",
+        diff_label:"Dificultad", diff_easy:"🟢 Fácil", diff_normal:"🟡 Normal", diff_hard:"🔴 Difícil", diff_veryhard:"🔥 Muy Difícil", diff_insane:"💀 Extremo", diff_impossible:"👾 Imposible",
+        detail_label:"Ajustes", ctrl_total:"🧪 Tubos Totales", ctrl_empty:"🥛 Tubos Vacíos", ctrl_emoji:"🎨 Tipos de Emoji",
+        time_label:"Tiempo Límite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Sin Límite",
+        theme_label:"Tema de Emoji", theme_mixed:"🎨 Mixto", theme_animals:"🦁 Animales", theme_fruits:"🍎 Frutas", theme_foods:"🍔 Comidas", theme_activities:"⚽ Deportes",
+        start_btn:"Comenzar ⚔️", other_game:"Otros Juegos",
+        cd_ready:"⚔️ Prepárate para la batalla ⚔️", cd_go:"¡Prepárate!",
+        back_btn:"🏠 Ajustes", timer_run:"⏱️ Tiempo", fullscreen:"🖥️ Pantalla Completa",
+        blue_team:"🔵 EQUIPO AZUL", red_team:"🔴 EQUIPO ROJO", completed:"Hecho:", reset_left:"🔵 Reiniciar", reset_right:"🔴 Reiniciar",
+        modal_replay:"Jugar Otra Vez ⚔️", modal_setup:"Ajustes",
+        search_ph:"Buscar ...", no_result:"Sin resultados", toast:"Idioma cambiado.",
+        seo_title:"Rey de Clasificación Emoji - Puzzle de Ordenar Agua", seo_desc:"¡Ordena emojis para llenar los tubos en este duelo de 2 jugadores! Equipo Azul contra Rojo en tiempo real.", seo_keywords:"clasificar emoji, puzzle de agua, juego de ordenar, rompecabezas" },
+
+      fr: { title:"Roi du Tri des Emojis", subtitle:"Relève le défi du casse-tête de tri !",
+        diff_label:"Difficulté", diff_easy:"🟢 Facile", diff_normal:"🟡 Normal", diff_hard:"🔴 Difficile", diff_veryhard:"🔥 Très Difficile", diff_insane:"💀 Extrême", diff_impossible:"👾 Impossible",
+        detail_label:"Réglages", ctrl_total:"🧪 Tubes Totaux", ctrl_empty:"🥛 Tubes Vides", ctrl_emoji:"🎨 Types d’Emoji",
+        time_label:"Temps Limite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Illimité",
+        theme_label:"Thème Emoji", theme_mixed:"🎨 Mixte", theme_animals:"🦁 Animaux", theme_fruits:"🍎 Fruits", theme_foods:"🍔 Nourriture", theme_activities:"⚽ Sports",
+        start_btn:"Commencer ⚔️", other_game:"Autres Jeux",
+        cd_ready:"⚔️ Prépare-toi au combat ⚔️", cd_go:"Prêt !",
+        back_btn:"🏠 Réglages", timer_run:"⏱️ Temps", fullscreen:"🖥️ Plein Écran",
+        blue_team:"🔵 ÉQUIPE BLEUE", red_team:"🔴 ÉQUIPE ROUGE", completed:"Fini :", reset_left:"🔵 Recommencer", reset_right:"🔴 Recommencer",
+        modal_replay:"Rejouer ⚔️", modal_setup:"Réglages",
+        search_ph:"Rechercher ...", no_result:"Aucun résultat", toast:"Langue modifiée.",
+        seo_title:"Roi du Tri des Emojis - Puzzle de Tri d’Eau", seo_desc:"Trie les emojis pour remplir les tubes dans ce duel à 2 joueurs ! Équipe Bleue contre Rouge en temps réel.", seo_keywords:"tri emoji, puzzle de tri d’eau, jeu de tri, casse-tête" },
+
+      de: { title:"Emoji-Sortier-König", subtitle:"Meistere das Sortier-Rätsel!",
+        diff_label:"Schwierigkeit", diff_easy:"🟢 Leicht", diff_normal:"🟡 Normal", diff_hard:"🔴 Schwer", diff_veryhard:"🔥 Sehr Schwer", diff_insane:"💀 Extrem", diff_impossible:"👾 Unmöglich",
+        detail_label:"Einstellungen", ctrl_total:"🧪 Röhren Gesamt", ctrl_empty:"🥛 Leere Röhren", ctrl_emoji:"🎨 Emoji-Arten",
+        time_label:"Zeitlimit", time_1:"⏱️ 1 Min", time_2:"⏱️ 2 Min", time_3:"⏱️ 3 Min", time_4:"⏱️ 4 Min", time_5:"⏱️ 5 Min", time_inf:"♾️ Kein Limit",
+        theme_label:"Emoji-Thema", theme_mixed:"🎨 Gemischt", theme_animals:"🦁 Tiere", theme_fruits:"🍎 Früchte", theme_foods:"🍔 Essen", theme_activities:"⚽ Sport",
+        start_btn:"Kampf Starten ⚔️", other_game:"Andere Spiele",
+        cd_ready:"⚔️ Mach dich bereit zum Kampf ⚔️", cd_go:"Bereit machen!",
+        back_btn:"🏠 Einstellungen", timer_run:"⏱️ Zeit", fullscreen:"🖥️ Vollbild",
+        blue_team:"🔵 BLAUES TEAM", red_team:"🔴 ROTES TEAM", completed:"Fertig:", reset_left:"🔵 Neustart", reset_right:"🔴 Neustart",
+        modal_replay:"Nochmal ⚔️", modal_setup:"Einstellungen",
+        search_ph:"Suchen ...", no_result:"Keine Ergebnisse", toast:"Sprache geändert.",
+        seo_title:"Emoji-Sortier-König - Wasser-Sortier-Rätsel", seo_desc:"Sortiere Emojis, um die Röhren im 2-Spieler-Duell zu füllen! Blaues gegen Rotes Team in Echtzeit.", seo_keywords:"emoji sortieren, wasser sortier rätsel, sortierspiel, denkspiel" },
+
+      it: { title:"Re dell’Ordinamento Emoji", subtitle:"Affronta la sfida del rompicapo!",
+        diff_label:"Difficoltà", diff_easy:"🟢 Facile", diff_normal:"🟡 Normale", diff_hard:"🔴 Difficile", diff_veryhard:"🔥 Molto Difficile", diff_insane:"💀 Estremo", diff_impossible:"👾 Impossibile",
+        detail_label:"Impostazioni", ctrl_total:"🧪 Tubi Totali", ctrl_empty:"🥛 Tubi Vuoti", ctrl_emoji:"🎨 Tipi di Emoji",
+        time_label:"Tempo Limite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Illimitato",
+        theme_label:"Tema Emoji", theme_mixed:"🎨 Misto", theme_animals:"🦁 Animali", theme_fruits:"🍎 Frutta", theme_foods:"🍔 Cibo", theme_activities:"⚽ Sport",
+        start_btn:"Inizia ⚔️", other_game:"Altri Giochi",
+        cd_ready:"⚔️ Preparati alla battaglia ⚔️", cd_go:"Preparati!",
+        back_btn:"🏠 Impostazioni", timer_run:"⏱️ Tempo", fullscreen:"🖥️ Schermo Intero",
+        blue_team:"🔵 SQUADRA BLU", red_team:"🔴 SQUADRA ROSSA", completed:"Fatto:", reset_left:"🔵 Ricomincia", reset_right:"🔴 Ricomincia",
+        modal_replay:"Gioca Ancora ⚔️", modal_setup:"Impostazioni",
+        search_ph:"Cerca ...", no_result:"Nessun risultato", toast:"Lingua cambiata.",
+        seo_title:"Re dell’Ordinamento Emoji - Rompicapo di Ordinamento Acqua", seo_desc:"Ordina le emoji per riempire i tubi in questo duello a 2 giocatori! Squadra Blu contro Rossa in tempo reale.", seo_keywords:"ordina emoji, rompicapo acqua, gioco di ordinamento, puzzle" },
+
+      "pt-br": { title:"Rei da Ordenação de Emojis", subtitle:"Encare o desafio do quebra-cabeça!",
+        diff_label:"Dificuldade", diff_easy:"🟢 Fácil", diff_normal:"🟡 Normal", diff_hard:"🔴 Difícil", diff_veryhard:"🔥 Muito Difícil", diff_insane:"💀 Insano", diff_impossible:"👾 Impossível",
+        detail_label:"Configurações", ctrl_total:"🧪 Total de Tubos", ctrl_empty:"🥛 Tubos Vazios", ctrl_emoji:"🎨 Tipos de Emoji",
+        time_label:"Tempo Limite", time_1:"⏱️ 1 min", time_2:"⏱️ 2 min", time_3:"⏱️ 3 min", time_4:"⏱️ 4 min", time_5:"⏱️ 5 min", time_inf:"♾️ Sem Limite",
+        theme_label:"Tema de Emoji", theme_mixed:"🎨 Misto", theme_animals:"🦁 Animais", theme_fruits:"🍎 Frutas", theme_foods:"🍔 Comidas", theme_activities:"⚽ Esportes",
+        start_btn:"Começar ⚔️", other_game:"Outros Jogos",
+        cd_ready:"⚔️ Prepare-se para a batalha ⚔️", cd_go:"Prepare-se!",
+        back_btn:"🏠 Ajustes", timer_run:"⏱️ Tempo", fullscreen:"🖥️ Tela Cheia",
+        blue_team:"🔵 TIME AZUL", red_team:"🔴 TIME VERMELHO", completed:"Feito:", reset_left:"🔵 Recomeçar", reset_right:"🔴 Recomeçar",
+        modal_replay:"Jogar de Novo ⚔️", modal_setup:"Ajustes",
+        search_ph:"Buscar ...", no_result:"Sem resultados", toast:"Idioma alterado.",
+        seo_title:"Rei da Ordenação de Emojis - Quebra-cabeça de Ordenar Água", seo_desc:"Ordene emojis para encher os tubos neste duelo de 2 jogadores! Time Azul contra Vermelho em tempo real.", seo_keywords:"ordenar emoji, quebra-cabeça de água, jogo de ordenar, puzzle" },
+
+      ru: { title:"Король Сортировки Эмодзи", subtitle:"Прими вызов головоломки!",
+        diff_label:"Сложность", diff_easy:"🟢 Легко", diff_normal:"🟡 Средне", diff_hard:"🔴 Сложно", diff_veryhard:"🔥 Очень сложно", diff_insane:"💀 Безумно", diff_impossible:"👾 Невозможно",
+        detail_label:"Настройки", ctrl_total:"🧪 Всего колб", ctrl_empty:"🥛 Пустые колбы", ctrl_emoji:"🎨 Виды эмодзи",
+        time_label:"Лимит времени", time_1:"⏱️ 1 мин", time_2:"⏱️ 2 мин", time_3:"⏱️ 3 мин", time_4:"⏱️ 4 мин", time_5:"⏱️ 5 мин", time_inf:"♾️ Без лимита",
+        theme_label:"Тема эмодзи", theme_mixed:"🎨 Микс", theme_animals:"🦁 Животные", theme_fruits:"🍎 Фрукты", theme_foods:"🍔 Еда", theme_activities:"⚽ Спорт",
+        start_btn:"Начать бой ⚔️", other_game:"Другие игры",
+        cd_ready:"⚔️ Готовимся к битве ⚔️", cd_go:"Приготовься!",
+        back_btn:"🏠 Настройки", timer_run:"⏱️ Время", fullscreen:"🖥️ Во весь экран",
+        blue_team:"🔵 СИНЯЯ КОМАНДА", red_team:"🔴 КРАСНАЯ КОМАНДА", completed:"Готово:", reset_left:"🔵 Заново", reset_right:"🔴 Заново",
+        modal_replay:"Ещё раз ⚔️", modal_setup:"Настройки",
+        search_ph:"Поиск ...", no_result:"Нет результатов", toast:"Язык изменён.",
+        seo_title:"Король Сортировки Эмодзи - Головоломка сортировки воды", seo_desc:"Сортируй эмодзи и заполняй колбы в этой дуэли на двоих! Синие против Красных в реальном времени.", seo_keywords:"сортировка эмодзи, головоломка воды, игра сортировка, пазл" },
+
+      hi: { title:"इमोजी सॉर्ट किंग", subtitle:"सॉर्ट पहेली की चुनौती लो!",
+        diff_label:"कठिनाई", diff_easy:"🟢 आसान", diff_normal:"🟡 सामान्य", diff_hard:"🔴 कठिन", diff_veryhard:"🔥 बहुत कठिन", diff_insane:"💀 अति कठिन", diff_impossible:"👾 असंभव",
+        detail_label:"सेटिंग्स", ctrl_total:"🧪 कुल ट्यूब", ctrl_empty:"🥛 खाली ट्यूब", ctrl_emoji:"🎨 इमोजी प्रकार",
+        time_label:"समय सीमा", time_1:"⏱️ 1 मिन", time_2:"⏱️ 2 मिन", time_3:"⏱️ 3 मिन", time_4:"⏱️ 4 मिन", time_5:"⏱️ 5 मिन", time_inf:"♾️ असीमित",
+        theme_label:"इमोजी थीम", theme_mixed:"🎨 मिश्रित", theme_animals:"🦁 जानवर", theme_fruits:"🍎 फल", theme_foods:"🍔 भोजन", theme_activities:"⚽ खेल",
+        start_btn:"शुरू करें ⚔️", other_game:"अन्य खेल",
+        cd_ready:"⚔️ लड़ाई के लिए तैयार हो जाओ ⚔️", cd_go:"तैयार हो जाओ!",
+        back_btn:"🏠 सेटिंग्स", timer_run:"⏱️ समय", fullscreen:"🖥️ पूर्ण स्क्रीन",
+        blue_team:"🔵 नीली टीम", red_team:"🔴 लाल टीम", completed:"पूर्ण:", reset_left:"🔵 फिर से", reset_right:"🔴 फिर से",
+        modal_replay:"फिर खेलें ⚔️", modal_setup:"सेटिंग्स",
+        search_ph:"खोजें ...", no_result:"कोई परिणाम नहीं", toast:"भाषा बदल दी गई है।",
+        seo_title:"इमोजी सॉर्ट किंग - वाटर सॉर्ट पहेली", seo_desc:"2 खिलाड़ियों के इस मुकाबले में इमोजी छांटकर ट्यूब भरें! नीली टीम बनाम लाल टीम रियल टाइम में।", seo_keywords:"इमोजी सॉर्ट, वाटर सॉर्ट पहेली, सॉर्ट गेम, दिमागी पहेली" },
+
+      bn: { title:"ইমোজি সর্ট কিং", subtitle:"সাজানোর ধাঁধার চ্যালেঞ্জ নাও!",
+        diff_label:"কঠিনতা", diff_easy:"🟢 সহজ", diff_normal:"🟡 সাধারণ", diff_hard:"🔴 কঠিন", diff_veryhard:"🔥 খুব কঠিন", diff_insane:"💀 অতি কঠিন", diff_impossible:"👾 অসম্ভব",
+        detail_label:"সেটিংস", ctrl_total:"🧪 মোট টিউব", ctrl_empty:"🥛 খালি টিউব", ctrl_emoji:"🎨 ইমোজির ধরন",
+        time_label:"সময় সীমা", time_1:"⏱️ ১ মিন", time_2:"⏱️ ২ মিন", time_3:"⏱️ ৩ মিন", time_4:"⏱️ ৪ মিন", time_5:"⏱️ ৫ মিন", time_inf:"♾️ সীমাহীন",
+        theme_label:"ইমোজি থিম", theme_mixed:"🎨 মিশ্র", theme_animals:"🦁 প্রাণী", theme_fruits:"🍎 ফল", theme_foods:"🍔 খাবার", theme_activities:"⚽ খেলা",
+        start_btn:"শুরু করো ⚔️", other_game:"অন্য গেম",
+        cd_ready:"⚔️ লড়াইয়ের জন্য প্রস্তুত হও ⚔️", cd_go:"প্রস্তুত হও!",
+        back_btn:"🏠 সেটিংস", timer_run:"⏱️ সময়", fullscreen:"🖥️ পূর্ণ স্ক্রিন",
+        blue_team:"🔵 নীল দল", red_team:"🔴 লাল দল", completed:"সম্পন্ন:", reset_left:"🔵 আবার", reset_right:"🔴 আবার",
+        modal_replay:"আবার খেলো ⚔️", modal_setup:"সেটিংস",
+        search_ph:"খুঁজুন ...", no_result:"কোন ফলাফল নেই", toast:"ভাষা পরিবর্তন করা হয়েছে।",
+        seo_title:"ইমোজি সর্ট কিং - ওয়াটার সর্ট ধাঁধা", seo_desc:"২ জনের এই লড়াইয়ে ইমোজি সাজিয়ে টিউব ভরাও! নীল দল বনাম লাল দল রিয়েল টাইমে।", seo_keywords:"ইমোজি সর্ট, ওয়াটার সর্ট ধাঁধা, সাজানো গেম, ধাঁধা" },
+
+      id: { title:"Raja Sortir Emoji", subtitle:"Tantang batas teka-teki sortir!",
+        diff_label:"Kesulitan", diff_easy:"🟢 Mudah", diff_normal:"🟡 Sedang", diff_hard:"🔴 Sulit", diff_veryhard:"🔥 Sangat Sulit", diff_insane:"💀 Gila", diff_impossible:"👾 Mustahil",
+        detail_label:"Pengaturan", ctrl_total:"🧪 Total Tabung", ctrl_empty:"🥛 Tabung Kosong", ctrl_emoji:"🎨 Jenis Emoji",
+        time_label:"Batas Waktu", time_1:"⏱️ 1 mnt", time_2:"⏱️ 2 mnt", time_3:"⏱️ 3 mnt", time_4:"⏱️ 4 mnt", time_5:"⏱️ 5 mnt", time_inf:"♾️ Tanpa Batas",
+        theme_label:"Tema Emoji", theme_mixed:"🎨 Campuran", theme_animals:"🦁 Hewan", theme_fruits:"🍎 Buah", theme_foods:"🍔 Makanan", theme_activities:"⚽ Olahraga",
+        start_btn:"Mulai Duel ⚔️", other_game:"Game Lain",
+        cd_ready:"⚔️ Bersiap untuk bertanding ⚔️", cd_go:"Bersiap!",
+        back_btn:"🏠 Pengaturan", timer_run:"⏱️ Waktu", fullscreen:"🖥️ Layar Penuh",
+        blue_team:"🔵 TIM BIRU", red_team:"🔴 TIM MERAH", completed:"Selesai:", reset_left:"🔵 Ulangi", reset_right:"🔴 Ulangi",
+        modal_replay:"Main Lagi ⚔️", modal_setup:"Pengaturan",
+        search_ph:"Cari ...", no_result:"Tidak ada hasil", toast:"Bahasa telah diubah.",
+        seo_title:"Raja Sortir Emoji - Teka-teki Sortir Air", seo_desc:"Susun emoji untuk mengisi tabung dalam duel 2 pemain! Tim Biru lawan Merah secara langsung.", seo_keywords:"sortir emoji, teka-teki air, game sortir, puzzle otak" },
+
+      vi: { title:"Vua Sắp Xếp Emoji", subtitle:"Thử thách giới hạn xếp hình!",
+        diff_label:"Độ khó", diff_easy:"🟢 Dễ", diff_normal:"🟡 Thường", diff_hard:"🔴 Khó", diff_veryhard:"🔥 Rất khó", diff_insane:"💀 Cực khó", diff_impossible:"👾 Bất khả thi",
+        detail_label:"Cài đặt", ctrl_total:"🧪 Tổng số ống", ctrl_empty:"🥛 Ống trống", ctrl_emoji:"🎨 Loại emoji",
+        time_label:"Giới hạn giờ", time_1:"⏱️ 1 phút", time_2:"⏱️ 2 phút", time_3:"⏱️ 3 phút", time_4:"⏱️ 4 phút", time_5:"⏱️ 5 phút", time_inf:"♾️ Không giới hạn",
+        theme_label:"Chủ đề emoji", theme_mixed:"🎨 Hỗn hợp", theme_animals:"🦁 Động vật", theme_fruits:"🍎 Trái cây", theme_foods:"🍔 Đồ ăn", theme_activities:"⚽ Thể thao",
+        start_btn:"Bắt đầu ⚔️", other_game:"Trò chơi khác",
+        cd_ready:"⚔️ Chuẩn bị chiến đấu ⚔️", cd_go:"Sẵn sàng!",
+        back_btn:"🏠 Cài đặt", timer_run:"⏱️ Thời gian", fullscreen:"🖥️ Toàn màn hình",
+        blue_team:"🔵 ĐỘI XANH", red_team:"🔴 ĐỘI ĐỎ", completed:"Xong:", reset_left:"🔵 Chơi lại", reset_right:"🔴 Chơi lại",
+        modal_replay:"Chơi lại ⚔️", modal_setup:"Cài đặt",
+        search_ph:"Tìm kiếm ...", no_result:"Không có kết quả", toast:"Ngôn ngữ đã được thay đổi.",
+        seo_title:"Vua Sắp Xếp Emoji - Giải đố xếp nước", seo_desc:"Sắp xếp emoji để lấp đầy ống nghiệm trong trận đấu 2 người! Đội Xanh đấu Đội Đỏ theo thời gian thực.", seo_keywords:"sắp xếp emoji, giải đố xếp nước, trò chơi xếp, câu đố" },
+
+      th: { title:"ราชาจัดเรียงอิโมจิ", subtitle:"ท้าทายขีดสุดของเกมจัดเรียง!",
+        diff_label:"ระดับ", diff_easy:"🟢 ง่าย", diff_normal:"🟡 ปานกลาง", diff_hard:"🔴 ยาก", diff_veryhard:"🔥 ยากมาก", diff_insane:"💀 โหด", diff_impossible:"👾 เป็นไปไม่ได้",
+        detail_label:"ตั้งค่า", ctrl_total:"🧪 หลอดทั้งหมด", ctrl_empty:"🥛 หลอดว่าง", ctrl_emoji:"🎨 ชนิดอิโมจิ",
+        time_label:"จำกัดเวลา", time_1:"⏱️ 1 นาที", time_2:"⏱️ 2 นาที", time_3:"⏱️ 3 นาที", time_4:"⏱️ 4 นาที", time_5:"⏱️ 5 นาที", time_inf:"♾️ ไม่จำกัด",
+        theme_label:"ธีมอิโมจิ", theme_mixed:"🎨 ผสม", theme_animals:"🦁 สัตว์", theme_fruits:"🍎 ผลไม้", theme_foods:"🍔 อาหาร", theme_activities:"⚽ กีฬา",
+        start_btn:"เริ่มการต่อสู้ ⚔️", other_game:"เกมอื่น",
+        cd_ready:"⚔️ เตรียมพร้อมสู้ ⚔️", cd_go:"เตรียมตัว!",
+        back_btn:"🏠 ตั้งค่า", timer_run:"⏱️ เวลา", fullscreen:"🖥️ เต็มจอ",
+        blue_team:"🔵 ทีมน้ำเงิน", red_team:"🔴 ทีมแดง", completed:"เสร็จ:", reset_left:"🔵 เริ่มใหม่", reset_right:"🔴 เริ่มใหม่",
+        modal_replay:"เล่นอีกครั้ง ⚔️", modal_setup:"ตั้งค่า",
+        search_ph:"ค้นหา ...", no_result:"ไม่พบผลลัพธ์", toast:"เปลี่ยนภาษาเรียบร้อยแล้ว",
+        seo_title:"ราชาจัดเรียงอิโมจิ - เกมเรียงน้ำ", seo_desc:"จัดเรียงอิโมจิให้เต็มหลอดในเกมต่อสู้ 2 คน! ทีมน้ำเงินปะทะทีมแดงแบบเรียลไทม์", seo_keywords:"จัดเรียงอิโมจิ, เกมเรียงน้ำ, เกมจัดเรียง, เกมปริศนา" },
+
+      tr: { title:"Emoji Sıralama Kralı", subtitle:"Sıralama bulmacasının sınırını zorla!",
+        diff_label:"Zorluk", diff_easy:"🟢 Kolay", diff_normal:"🟡 Normal", diff_hard:"🔴 Zor", diff_veryhard:"🔥 Çok Zor", diff_insane:"💀 Çılgın", diff_impossible:"👾 İmkansız",
+        detail_label:"Ayarlar", ctrl_total:"🧪 Toplam Tüp", ctrl_empty:"🥛 Boş Tüp", ctrl_emoji:"🎨 Emoji Türü",
+        time_label:"Süre Sınırı", time_1:"⏱️ 1 dk", time_2:"⏱️ 2 dk", time_3:"⏱️ 3 dk", time_4:"⏱️ 4 dk", time_5:"⏱️ 5 dk", time_inf:"♾️ Sınırsız",
+        theme_label:"Emoji Teması", theme_mixed:"🎨 Karışık", theme_animals:"🦁 Hayvanlar", theme_fruits:"🍎 Meyveler", theme_foods:"🍔 Yiyecekler", theme_activities:"⚽ Spor",
+        start_btn:"Başla ⚔️", other_game:"Diğer Oyunlar",
+        cd_ready:"⚔️ Savaşa hazırlan ⚔️", cd_go:"Hazır ol!",
+        back_btn:"🏠 Ayarlar", timer_run:"⏱️ Süre", fullscreen:"🖥️ Tam Ekran",
+        blue_team:"🔵 MAVİ TAKIM", red_team:"🔴 KIRMIZI TAKIM", completed:"Bitti:", reset_left:"🔵 Yeniden", reset_right:"🔴 Yeniden",
+        modal_replay:"Tekrar Oyna ⚔️", modal_setup:"Ayarlar",
+        search_ph:"Ara ...", no_result:"Sonuç yok", toast:"Dil değiştirildi.",
+        seo_title:"Emoji Sıralama Kralı - Su Sıralama Bulmacası", seo_desc:"2 kişilik bu düelloda emojileri sıralayıp tüpleri doldur! Mavi Takım Kırmızı Takıma karşı canlı.", seo_keywords:"emoji sıralama, su sıralama bulmaca, sıralama oyunu, zeka oyunu" }
+    };
+
+    var SUPPORTED = ['ko','en','zh','ja','es','fr','de','it','pt-br','ru','hi','bn','id','vi','th','tr'];
+    var STORAGE_KEY = 'kingsmath_lang';
+    var currentLang = 'en';
+
+    function getLang(code){ for (var i=0;i<languages.length;i++){ if(languages[i].code===code) return languages[i]; } return null; }
+
+    // 브라우저/파라미터 코드 → 지원 코드 정규화
+    function normalizeLang(raw){
+      if(!raw) return null;
+      raw = String(raw).toLowerCase().replace('_','-');
+      if(raw === 'pt-br' || raw.indexOf('pt') === 0) return 'pt-br';
+      if(raw.indexOf('zh') === 0) return 'zh';
+      if(SUPPORTED.indexOf(raw) !== -1) return raw;
+      var base = raw.split('-')[0];
+      if(SUPPORTED.indexOf(base) !== -1) return base;
+      return null;
+    }
+
+    // 우선순위: URL > localStorage > navigator > en
+    function detectLang(){
+      try {
+        var fromUrl = normalizeLang(new URLSearchParams(window.location.search).get('lang'));
+        if(fromUrl) return fromUrl;
+      } catch(e){}
+      try {
+        var stored = normalizeLang(localStorage.getItem(STORAGE_KEY));
+        if(stored) return stored;
+      } catch(e){}
+      try {
+        var navs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+        for(var i=0;i<navs.length;i++){ var n = normalizeLang(navs[i]); if(n) return n; }
+      } catch(e){}
+      return 'en';
+    }
+
+    // 긴 번역이 버튼을 벗어나지 않도록 폰트 크기 동적 축소 (모달/게임 CSS와 무관, 인라인 스타일만)
+    function fitText(el, minPx){
+      if(!el) return;
+      el.style.fontSize = '';
+      var size = parseFloat(getComputedStyle(el).fontSize) || 14;
+      var prevWs = el.style.whiteSpace;
+      el.style.whiteSpace = 'nowrap';
+      var guard = 0;
+      while(el.scrollWidth > el.clientWidth + 1 && size > minPx && guard < 60){
+        size -= 0.5; el.style.fontSize = size + 'px'; guard++;
+      }
+      el.style.whiteSpace = prevWs;
+    }
+
+    function setText(sel, val){ var el = document.querySelector(sel); if(el && val != null) el.textContent = val; }
+
+    function applyI18n(lang){
+      var t = T[lang] || T.en;
+
+      // 설정 화면
+      setText('.setup-header h1', t.title);
+      setText('.setup-header p', t.subtitle);
+
+      var diffGrid = document.getElementById('difficulty-options');
+      if(diffGrid){ var dh = diffGrid.closest('.setting-section').querySelector('h3'); if(dh) dh.textContent = t.diff_label; }
+      var diffMap = { easy:t.diff_easy, normal:t.diff_normal, hard:t.diff_hard, veryhard:t.diff_veryhard, insane:t.diff_insane, impossible:t.diff_impossible };
+      Object.keys(diffMap).forEach(function(k){ var b = document.querySelector('#difficulty-options .option-btn[data-value="'+k+'"]'); if(b) b.textContent = diffMap[k]; });
+
+      var detGrid = document.querySelector('.compact-controls-grid');
+      if(detGrid){ var deh = detGrid.closest('.setting-section').querySelector('h3'); if(deh) deh.textContent = t.detail_label; }
+      var labels = document.querySelectorAll('.control-label');
+      if(labels[0]) labels[0].textContent = t.ctrl_total;
+      if(labels[1]) labels[1].textContent = t.ctrl_empty;
+      if(labels[2]) labels[2].textContent = t.ctrl_emoji;
+
+      var timeGrid = document.getElementById('time-options');
+      if(timeGrid){ var th3 = timeGrid.closest('.setting-section').querySelector('h3'); if(th3) th3.textContent = t.time_label; }
+      var timeMap = { '60':t.time_1, '120':t.time_2, '180':t.time_3, '240':t.time_4, '300':t.time_5, 'infinite':t.time_inf };
+      Object.keys(timeMap).forEach(function(k){ var b = document.querySelector('#time-options .option-btn[data-value="'+k+'"]'); if(b) b.textContent = timeMap[k]; });
+
+      var themeWrap = document.querySelector('.theme-options');
+      if(themeWrap){ var thh = themeWrap.closest('.setting-section').querySelector('h3'); if(thh) thh.textContent = t.theme_label; }
+      var themeMap = { mixed:t.theme_mixed, animals:t.theme_animals, fruits:t.theme_fruits, foods:t.theme_foods, activities:t.theme_activities };
+      Object.keys(themeMap).forEach(function(k){ var b = document.querySelector('.theme-btn[data-theme="'+k+'"]'); if(b) b.textContent = themeMap[k]; });
+
+      setText('#start-btn', t.start_btn);
+      setText('#other-game-btn', t.other_game);
+
+      // 카운트다운 / 게임 화면 정적 텍스트
+      setText('#countdown-screen h2', t.cd_ready);
+      setText('#countdown-screen > div > p', t.cd_go);
+      setText('#back-btn', t.back_btn);
+      if(!document.fullscreenElement) setText('#timer-label', t.timer_run);
+      var fsb = document.getElementById('fullscreen-btn');
+      if(fsb && !document.fullscreenElement) fsb.textContent = t.fullscreen;
+      setText('#left-team-title', t.blue_team);
+      setText('#right-team-title', t.red_team);
+      var cls = document.querySelectorAll('.km-completed-label');
+      for(var i=0;i<cls.length;i++) cls[i].textContent = t.completed;
+      setText('#reset-left-btn', t.reset_left);
+      setText('#reset-right-btn', t.reset_right);
+      setText('#modal-replay-btn', t.modal_replay);
+      setText('#modal-setup-btn', t.modal_setup);
+
+      // 모달 자체 텍스트
+      var si = document.getElementById('kmSearchInput'); if(si) si.placeholder = t.search_ph;
+      var nr = document.querySelector('#kmNoResult p'); if(nr) nr.textContent = t.no_result;
+
+      // 폰트 자동 맞춤 (넘칠 때만 축소)
+      ['#start-btn','#other-game-btn','#reset-left-btn','#reset-right-btn','#back-btn','#fullscreen-btn','#modal-replay-btn','#modal-setup-btn'].forEach(function(s){ fitText(document.querySelector(s), 9); });
+    }
+
+    function applySEO(lang){
+      var t = T[lang] || T.en;
+      document.title = t.seo_title || t.title;
+      setMeta('description', t.seo_desc);
+      setMeta('keywords', t.seo_keywords);
+    }
+    function setMeta(name, content){
+      if(content == null) return;
+      var m = document.querySelector('meta[name="'+name+'"]');
+      if(!m){ m = document.createElement('meta'); m.setAttribute('name', name); document.head.appendChild(m); }
+      m.setAttribute('content', content);
+    }
+
+    function setLanguage(code, opts){
+      opts = opts || {};
+      if(!T[code]) code = 'en';
+      currentLang = code;
+
+      applyI18n(code);
+      applySEO(code);
+
+      var htmlLang = (code === 'pt-br') ? 'pt-BR' : (code === 'zh' ? 'zh-CN' : code);
+      document.documentElement.setAttribute('lang', htmlLang);
+
+      if(opts.save !== false){ try { localStorage.setItem(STORAGE_KEY, code); } catch(e){} }
+
+      if(opts.url !== false){
+        try {
+          var url = new URL(window.location.href);
+          url.searchParams.set('lang', code);
+          if(opts.replace) history.replaceState({ kmLang: code }, '', url.toString());
+          else history.pushState({ kmLang: code }, '', url.toString());
+        } catch(e){}
+      }
+
+      // 트리거 버튼 갱신
+      var L = getLang(code);
+      if(L){
+        var f = document.getElementById('kmCurrentFlag'); if(f) f.src = 'https://flagcdn.com/w40/'+L.country+'.png';
+        var n = document.getElementById('kmCurrentName'); if(n) n.textContent = L.name;
+      }
+
+      var si = document.getElementById('kmSearchInput');
+      renderLanguages(si ? si.value : '');
+    }
+
+    // [요구8] 모달 목록 렌더 함수
+    function renderLanguages(filterText){
+      var grid = document.getElementById('kmLangGrid');
+      var noRes = document.getElementById('kmNoResult');
+      if(!grid) return;
+      var f = (filterText || '').toLowerCase();
+      grid.innerHTML = '';
+
+      var list = languages.filter(function(l){
+        return l.name.toLowerCase().indexOf(f) !== -1 ||
+               l.enName.toLowerCase().indexOf(f) !== -1 ||
+               l.code.toLowerCase().indexOf(f) !== -1;
+      });
+
+      if(list.length === 0){
+        grid.style.display = 'none';
+        if(noRes) noRes.classList.add('km-show');
+        return;
+      }
+      grid.style.display = 'grid';
+      if(noRes) noRes.classList.remove('km-show');
+
+      list.forEach(function(l){
+        var selected = (l.code === currentLang);
+        var item = document.createElement('div');
+        item.className = 'km-lang-item' + (selected ? ' km-selected' : '');
+        item.innerHTML =
+          '<div class="km-item-flag"><img src="https://flagcdn.com/w40/'+l.country+'.png" alt="'+l.country+'"></div>' +
+          '<div class="km-item-txt"><span class="km-item-name">'+l.name+'</span><span class="km-item-sub">'+l.enName+'</span></div>' +
+          (selected ? '<i class="fa-solid fa-circle-check km-check"></i>' : '');
+        item.addEventListener('click', function(){ selectLanguage(l); });
+        grid.appendChild(item);
+      });
+    }
+
+    // [요구9] 언어 선택 시 반드시 모달 닫기
+    function selectLanguage(lang){
+      setLanguage(lang.code, {});   // save + url pushState
+      closeModal();                 // 모달 닫힘 보장
+      showToast(lang);
+    }
+
+    var modal = null, toastTimeout = null;
+    function openModal(){
+      modal = modal || document.getElementById('langModal');
+      if(!modal) return;
+      modal.classList.add('km-active');
+      modal.setAttribute('aria-hidden', 'false');
+      var si = document.getElementById('kmSearchInput');
+      if(si){ si.value=''; renderLanguages(''); setTimeout(function(){ si.focus(); }, 120); }
+    }
+    function closeModal(){
+      modal = modal || document.getElementById('langModal');
+      if(!modal) return;
+      modal.classList.remove('km-active');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function showToast(lang){
+      var toast = document.getElementById('kmToast');
+      if(!toast) return;
+      var t = T[lang.code] || T.en;
+      var msgEl = document.getElementById('kmToastMsg');
+      var subEl = document.getElementById('kmToastLang');
+      if(msgEl) msgEl.textContent = t.toast;
+      if(subEl) subEl.textContent = lang.name;
+      toast.classList.add('km-show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(function(){ toast.classList.remove('km-show'); }, 3000);
+    }
+
+    // 언어 선택기는 첫(설정) 화면에서만 노출, 게임/카운트다운 화면에서는 숨김
+    function updateTriggerVisibility(){
+      var setup = document.getElementById('setup-screen');
+      var trigger = document.getElementById('kmLangTrigger');
+      if(!trigger) return;
+      var show = !!(setup && setup.classList.contains('active'));
+      trigger.style.display = show ? 'block' : 'none';
+      if(!show) closeModal();
+    }
+
+    function init(){
+      // [요구8] 초기 목록 렌더링
+      renderLanguages();
+
+      // 이벤트 바인딩
+      var btn = document.getElementById('kmLangBtn');
+      var closeBtn = document.getElementById('kmCloseBtn');
+      var search = document.getElementById('kmSearchInput');
+      modal = document.getElementById('langModal');
+
+      if(btn) btn.addEventListener('click', openModal);
+      if(closeBtn) closeBtn.addEventListener('click', closeModal);
+      if(modal) modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && modal && modal.classList.contains('km-active')) closeModal();
+      });
+      if(search) search.addEventListener('input', function(e){ renderLanguages(e.target.value); });
+
+      // 화면 전환 감지 → 트리거 노출 제어
+      ['setup-screen','countdown-screen','game-screen'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){ new MutationObserver(updateTriggerVisibility).observe(el, { attributes:true, attributeFilter:['class'] }); }
+      });
+      updateTriggerVisibility();
+
+      // 뒤로/앞으로 가기 시 URL 언어 반영
+      window.addEventListener('popstate', function(){
+        var p = null;
+        try { p = new URLSearchParams(window.location.search).get('lang'); } catch(e){}
+        var l = normalizeLang(p) || currentLang;
+        setLanguage(l, { url:false });
+      });
+
+      // 초기 언어 적용 (기기 언어 감지 시 저장은 하지 않고, URL만 반영)
+      var initial = detectLang();
+      setLanguage(initial, { save:false, replace:true });
+    }
+
+    // 전역 노출 (요구4의 홈 로직 등에서 재사용 가능하도록)
+    window.KMI18n = { setLanguage: setLanguage, renderLanguages: renderLanguages, openModal: openModal, closeModal: closeModal };
+
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
   </script>
 </body>
 </html>
